@@ -1,0 +1,29 @@
+# Local assistant state and private work records
+.workbuddy/
+
+# Dependencies and temporary verification files
+node_modules/
+package.json
+package-lock.json
+.tmp/
+.qa-*/
+_*.js
+_*.html
+_*.png
+_edgetmp/
+_edge2/
+_ffp/
+
+# Local configuration and credentials
+.env
+.env.*
+*.pem
+*.key
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.log
