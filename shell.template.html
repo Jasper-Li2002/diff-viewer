@@ -86,11 +86,11 @@ main{flex:1;min-height:0;position:relative}
               </span>
               <div>
                 <h2>工时填报机</h2>
-                <div class="sub">月度工时自动分配</div>
+                <div class="sub">多项目 · 按定额排布</div>
               </div>
             </div>
-            <p>输入本月总工时，自动换算天数并按自然周铺到日历；剩余工作日标 Training，节假日标 Vacation。</p>
-            <div class="tags"><span class="tag">日历视图</span><span class="tag">支持半天</span><span class="tag">CSV 导出</span></div>
+            <p>录入本月各项目的工时定额，自动按连续块铺到日历；一天可拆给多个项目，剩余工作日标 Training，节假日标 Vacation。</p>
+            <div class="tags"><span class="tag">多项目</span><span class="tag">1h 粒度</span><span class="tag">CSV 导出</span></div>
           </button>
 
           <button class="card" type="button" data-open="diff">
@@ -158,8 +158,12 @@ main{flex:1;min-height:0;position:relative}
      注入一层内存实现，并把写入桥接回父页面，保证草稿仍能持久化。 */
   function withStorageBridge(html) {
     var seed = {};
-    var saved = storageGet('workbuddy.timesheet.v1');
-    if (saved) seed['workbuddy.timesheet.v1'] = saved;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('workbuddy.') === 0) seed[k] = localStorage.getItem(k);
+      }
+    } catch (e) { }
 
     var shim = '<scr' + 'ipt>(function(){' +
       'var mem=' + JSON.stringify(seed) + ';' +

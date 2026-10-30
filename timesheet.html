@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>工时填报机 · 内部工具集</title>
+<title>工时填报机 · 多项目 · 内部工具箱</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%230F6E56'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='3'%20y='5'%20width='18'%20height='16'%20rx='3'/%3E%3Cpath%20d='M3%2010h18M8%203v4M16%203v4'/%3E%3Cpath%20d='M7.5%2014h4M7.5%2017h7'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -11,22 +11,21 @@
   --bg:#f5f6f8; --panel:#ffffff; --line:#e3e6ea; --line-soft:#eef0f3;
   --text:#1f2328; --muted:#6b7280; --faint:#9aa1a8;
   --accent:#0f6e56; --accent-ink:#ffffff; --accent-soft:#e8f6ef;
-  --work-bg:#e8f6ef; --work-line:#b7e3cc; --work-ink:#0f6e56;
   --train-bg:#f7f8fa; --train-line:#e3e6ea; --train-ink:#3d4450; --train-tag:#8a9099;
-  --hol-bg:#f1f2f4; --hol-line:#e9ebee; --hol-ink:#9aa1a8; --hol-tag:#a8aeb5;
+  --hol-bg:#f1f2f4; --hol-line:#e9ebee; --hol-ink:#9aa1a8;
   --rest-bg:#f7f7f8; --rest-line:#f0f1f3; --rest-ink:#b6bbc2;
   --warn:#9a5b00; --warn-bg:#fdf4e5; --warn-line:#f0dcb8;
-  --radius:10px;
+  --mask:rgba(15,23,32,.34);
 }
 html[data-theme="dark"]{
   --bg:#0d1117; --panel:#161b22; --line:#30363d; --line-soft:#222932;
   --text:#e6edf3; --muted:#8b949e; --faint:#6e7681;
   --accent:#2ea884; --accent-ink:#04140f; --accent-soft:#123326;
-  --work-bg:#123326; --work-line:#1f6b4a; --work-ink:#7fdda0;
   --train-bg:#1a2029; --train-line:#2a323d; --train-ink:#c3ccd6; --train-tag:#8b949e;
-  --hol-bg:#1c222b; --hol-line:#262d36; --hol-ink:#8b949e; --hol-tag:#8b949e;
+  --hol-bg:#1c222b; --hol-line:#262d36; --hol-ink:#8b949e;
   --rest-bg:#12171e; --rest-line:#1b222a; --rest-ink:#5c6672;
   --warn:#e3b341; --warn-bg:#2b2213; --warn-line:#4a3a1c;
+  --mask:rgba(1,4,9,.6);
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -34,12 +33,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-
 button,input,select{font:inherit;color:inherit}
 .app-head{display:flex;align-items:center;gap:10px;padding:11px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
 body.embedded .app-head{display:none}
-.app-head .brand{display:flex;align-items:center;gap:8px;font-weight:500}
 .app-head .logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.app-head .brand{font-weight:500}
 .app-head .back{margin-left:auto;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px}
-.app-head .back:hover{background:var(--line-soft)}
-.layout{display:grid;grid-template-columns:196px minmax(0,1fr);gap:16px;padding:16px 20px 26px;max-width:1180px;margin:0 auto;align-items:start}
-@media (max-width:840px){ .layout{grid-template-columns:1fr;padding:12px} .side{position:static!important} }
+.layout{display:grid;grid-template-columns:214px minmax(0,1fr);gap:16px;padding:16px 20px 26px;max-width:1220px;margin:0 auto;align-items:start}
+@media (max-width:900px){ .layout{grid-template-columns:1fr;padding:12px} .side{position:static!important} }
 .side{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;position:sticky;top:14px}
 .fld{display:block;font-size:11px;color:var(--muted);margin:0 0 4px}
 .control{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:6px 8px;font-size:13px;outline:none}
@@ -47,56 +45,78 @@ body.embedded .app-head{display:none}
 .mrow{display:flex;gap:6px;align-items:center}
 .arrow{width:28px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer;color:var(--muted)}
 .arrow:hover{background:var(--line-soft)}
-.hint{font-size:11px;color:var(--faint);margin:5px 0 12px;line-height:1.5}
+.hint{font-size:11px;color:var(--faint);margin:5px 0 0;line-height:1.5}
 .btn{width:100%;border:1px solid transparent;border-radius:7px;padding:7px 0;font-size:12.5px;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-weight:500}
 .btn:hover{filter:brightness(1.06)}
 .btn.ghost{background:var(--panel);border-color:var(--line);color:var(--text);font-weight:400}
 .btn.ghost:hover{background:var(--line-soft)}
 .btn+.btn{margin-top:6px}
-.stat{border-top:1px solid var(--line-soft);margin-top:12px;padding-top:9px}
+.sec{border-top:1px solid var(--line-soft);margin-top:12px;padding-top:11px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sec-h span{font-size:11px;color:var(--muted)}
+.sec-h button{border:0;background:transparent;color:var(--accent);font-size:11px;cursor:pointer;padding:0}
+.prow{display:grid;grid-template-columns:10px minmax(0,1fr) 46px 18px;gap:5px;align-items:center;margin-bottom:5px}
+.dot{width:9px;height:9px;border-radius:3px}
+.prow input{border:1px solid transparent;background:transparent;border-radius:5px;padding:3px 4px;font-size:12.5px;min-width:0;width:100%}
+.prow input:hover{border-color:var(--line)}
+.prow input:focus{border-color:var(--accent);background:var(--panel);outline:none;box-shadow:0 0 0 2px var(--accent-soft)}
+.prow input.num{text-align:right;font-variant-numeric:tabular-nums}
+.prow button{border:0;background:transparent;color:var(--faint);cursor:pointer;font-size:14px;line-height:1;padding:2px}
+.prow button:hover{color:#c0392b}
 .srow{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)}
 .srow b{font-weight:500;color:var(--text);font-variant-numeric:tabular-nums}
-.srow b.ok{color:var(--work-ink)}
+.srow b.ok{color:var(--accent)}
 .srow b.bad{color:var(--warn)}
 .bar{height:4px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:8px 0 2px}
 .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .18s ease}
 .bar.over i{background:var(--warn)}
-.legend{border-top:1px solid var(--line-soft);margin-top:11px;padding-top:9px}
-.lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-bottom:5px}
-.sw{width:11px;height:11px;border-radius:3px;flex:none;border:1px solid transparent}
-.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px;min-width:0}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
 .stage-top{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;flex-wrap:wrap}
 .stage-top h1{font-size:15px;font-weight:500;margin:0}
 .stage-top .sub{font-size:12px;color:var(--muted)}
 .stage-top .sp{flex:1}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 .dow{font-size:11px;color:var(--faint);text-align:center;padding:0 0 4px}
-.dow.we{color:var(--faint)}
-.day{position:relative;text-align:left;border:1px solid transparent;border-radius:9px;min-height:58px;padding:6px 7px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:2px;transition:box-shadow .12s,transform .12s;overflow:hidden}
+.day{position:relative;text-align:left;border:1px solid transparent;border-radius:9px;min-height:64px;padding:6px 7px 9px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;gap:1px;transition:box-shadow .12s;overflow:hidden}
 .day:hover{box-shadow:inset 0 0 0 2px var(--accent-soft)}
-.day .dn{font-size:14px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
-.day .dt{font-size:11px;line-height:1.15;letter-spacing:-.1px}
-.day.is-work{background:var(--work-bg);border-color:var(--work-line)}
-.day.is-work .dn,.day.is-work .dt{color:var(--work-ink)}
-.day.is-half{background:var(--work-bg);border-color:var(--work-line);border-style:dashed}
-.day.is-half .dn,.day.is-half .dt{color:var(--work-ink)}
+.day .dn{font-size:13.5px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.day .dt{font-size:10.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day .strip{position:absolute;left:0;right:0;bottom:0;height:4px;display:flex}
+.day .strip i{display:block;height:100%}
 .day.is-train{background:var(--train-bg);border-color:var(--train-line)}
 .day.is-train .dn{color:var(--train-ink)}
 .day.is-train .dt{color:var(--train-tag)}
 .day.is-hol{background:var(--hol-bg);border-color:var(--hol-line)}
-.day.is-hol .dn{color:var(--hol-ink)}
-.day.is-hol .dt{color:var(--hol-tag)}
+.day.is-hol .dn,.day.is-hol .dt{color:var(--hol-ink)}
 .day.is-rest{background:var(--rest-bg);border-color:var(--rest-line)}
 .day.is-rest .dn{color:var(--rest-ink)}
-.day.is-makeup{border-style:dashed;border-color:var(--faint)}
+.day.is-makeup{border-style:dashed}
 .day.is-today{box-shadow:inset 0 0 0 2px var(--accent)}
-.day.is-out{background:transparent;border-color:transparent;cursor:default;opacity:.33}
+.day.is-out{background:transparent;border-color:transparent;cursor:default;opacity:.3}
 .day.is-out:hover{box-shadow:none}
-.day.is-out .dn{font-weight:400}
 .stage-foot{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
 .warnbox{display:none;margin-top:10px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.55}
 .warnbox.on{display:block}
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);font-size:12.5px;padding:7px 14px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:20}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:30}
+.modal.on{display:flex}
+.modal .mask{position:absolute;inset:0;background:var(--mask)}
+.sheet{position:relative;width:min(420px,calc(100vw - 32px));background:var(--panel);border-radius:14px;border:1px solid var(--line);padding:16px 16px 14px;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.sheet-h{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.sheet-h b{font-size:14px;font-weight:500}
+.sheet-h .sum{margin-left:auto;font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.sheet-h .sum.ok{color:var(--accent)}
+.sheet-h .sum.bad{color:var(--warn)}
+.erow{display:grid;grid-template-columns:minmax(0,1fr) 58px 16px 18px;gap:6px;align-items:center;margin-bottom:6px}
+.erow select,.erow input{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:5px 6px;font-size:12.5px;min-width:0;outline:none}
+.erow select:focus,.erow input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.erow input{text-align:right;font-variant-numeric:tabular-nums}
+.erow .u{font-size:11px;color:var(--faint)}
+.erow button{border:0;background:transparent;color:var(--faint);cursor:pointer;font-size:15px;line-height:1;padding:2px}
+.erow button:hover{color:#c0392b}
+.sheet-f{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.sheet-f .btn{width:auto;padding:6px 14px}
+.sheet-f .sp{flex:1}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);font-size:12.5px;padding:7px 14px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:40}
 .toast.on{opacity:.94;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -104,8 +124,8 @@ body.embedded .app-head{display:none}
 <header class="app-head">
   <span class="logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
   <span class="brand">工时填报机</span>
-  <span style="font-size:12px;color:var(--muted)">月度工时自动分配</span>
-  <a class="back" href="index.html">返回工具集</a>
+  <span style="font-size:12px;color:var(--muted)">多项目 · 按月分配</span>
+  <a class="back" href="toolbox.html">返回工具箱</a>
 </header>
 
 <div class="layout">
@@ -117,41 +137,33 @@ body.embedded .app-head{display:none}
       <button class="arrow" id="btnNext" type="button" title="下一月" aria-label="下一月">&#8250;</button>
     </div>
 
-    <label class="fld" for="hoursInput" style="margin-top:12px">本月总工时</label>
-    <div class="mrow">
-      <input class="control" id="hoursInput" type="number" min="0" max="400" step="4" value="80" style="text-align:center;font-weight:500">
-      <span style="font-size:12px;color:var(--muted);flex:none">h</span>
+    <div class="sec">
+      <div class="sec-h">
+        <span>项目与定额</span>
+        <button type="button" id="btnAddProj">+ 添加</button>
+      </div>
+      <div id="projList"></div>
+      <div class="hint" id="projHint">合计 80h = 10 天</div>
     </div>
-    <div class="hint" id="dayHint">折合 10 天（每日 8h）</div>
 
-    <label class="fld" for="projInput">项目名称</label>
-    <input class="control" id="projInput" type="text" value="Project" maxlength="24">
-
-    <div style="margin-top:11px">
-      <label class="lg" style="cursor:pointer;margin-bottom:8px"><input type="checkbox" id="optMakeup" style="margin:0 0 0 1px"> 调休上班日参与分配</label>
+    <div class="sec">
+      <label class="lg" style="cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><input type="checkbox" id="optMakeup" style="margin:0"> 调休上班日参与分配</label>
       <button class="btn" id="btnAuto" type="button">自动分配</button>
       <button class="btn ghost" id="btnReset" type="button">清除手动调整</button>
     </div>
 
-    <div class="stat">
-      <div class="srow"><span>目标</span><b id="stTarget">80h · 10 天</b></div>
-      <div class="srow"><span>已分配</span><b id="stAlloc">80h · 10 天</b></div>
+    <div class="sec">
+      <div class="srow"><span>项目合计</span><b id="stTarget">80h · 10 天</b></div>
+      <div class="srow"><span>已排入</span><b id="stAlloc">80h</b></div>
       <div class="srow"><span>差额</span><b id="stGap" class="ok">0h</b></div>
       <div class="bar" id="bar"><i id="barFill"></i></div>
-      <div class="srow"><span>Training</span><b id="stTrain">7 天</b></div>
+      <div class="srow"><span>Training</span><b id="stTrain">0 天</b></div>
       <div class="srow" id="rowMakeup" style="display:none"><span>其中调休上班</span><b id="stMakeup">0 天</b></div>
-      <div class="srow"><span>Vacation</span><b id="stVac">7 天</b></div>
+      <div class="srow"><span>Vacation</span><b id="stVac">0 天</b></div>
     </div>
 
-    <div class="legend">
-      <div class="lg"><span class="sw" style="background:var(--work-bg);border-color:var(--work-line)"></span>填报工时</div>
-      <div class="lg"><span class="sw" style="background:var(--train-bg);border-color:var(--train-line)"></span>Training</div>
-      <div class="lg"><span class="sw" style="background:var(--hol-bg);border-color:var(--hol-line)"></span>Vacation</div>
-      <div class="lg"><span class="sw" style="background:transparent;border:1px dashed var(--faint)"></span>调休上班</div>
-    </div>
-
-    <div style="border-top:1px solid var(--line-soft);margin-top:10px;padding-top:10px">
-      <button class="btn ghost" id="btnCsv" type="button">导出 CSV</button>
+    <div class="sec">
+      <button class="btn ghost" id="btnCsv" type="button">导出 CSV（一天多行）</button>
       <button class="btn ghost" id="btnCopy" type="button">复制为文本</button>
       <button class="btn ghost" id="btnTheme" type="button">切换深色</button>
     </div>
@@ -160,17 +172,32 @@ body.embedded .app-head{display:none}
   <main class="stage">
     <div class="stage-top">
       <h1 id="stageTitle">2026 年 10 月</h1>
-      <span class="sub" id="stageSub">17 个工作日 · 已分配 10 天</span>
+      <span class="sub" id="stageSub">17 个可分配工作日</span>
       <span class="sp"></span>
-      <span class="sub">点击日期切换 · Shift+点击改日期类型</span>
+      <span class="sub">点击日期编辑 · Shift+点击改日期类型</span>
     </div>
     <div class="cal" id="cal"></div>
     <div class="warnbox" id="warn"></div>
     <div class="stage-foot">
-      <span id="footNote">分配结果按自然周均分，周内从首个工作日连续填报。</span>
+      <span id="footNote">按项目定额连续排布，整日填满后自动转入下一个项目。</span>
       <span style="margin-left:auto" id="footSource">节假日数据：国务院办公厅 2025-11-04 通知</span>
     </div>
   </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="mask" data-close="1"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="sheet-h"><b id="mTitle">10 月 8 日</b><span class="sum" id="mSum">8h / 8h</span></div>
+    <div id="mRows"></div>
+    <div class="sheet-f">
+      <button class="btn ghost" type="button" id="mAdd">+ 一行</button>
+      <button class="btn ghost" type="button" id="mClear">清空</button>
+      <span class="sp"></span>
+      <button class="btn ghost" type="button" id="mCancel">取消</button>
+      <button class="btn" type="button" id="mOk">确定</button>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -181,7 +208,7 @@ body.embedded .app-head{display:none}
   if (window.self !== window.top) document.body.classList.add('embedded');
 
   /* =========================================================
-   * 1. 节假日数据（国务院办公厅《关于2026年部分节假日安排的通知》）
+   * 1. 节假日数据（国务院办公厅 2025-11-04 通知）
    * =======================================================*/
   var HOLIDAY_RANGES = [
     ['2026-01-01', '2026-01-03'],
@@ -201,7 +228,7 @@ body.embedded .app-head{display:none}
   function keyOf(dt) { return dt.getFullYear() + '-' + pad2(dt.getMonth() + 1) + '-' + pad2(dt.getDate()); }
   function parseKey(k) { var p = k.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
 
-  (function buildSets() {
+  (function () {
     var i, d, end;
     for (i = 0; i < HOLIDAY_RANGES.length; i++) {
       d = parseKey(HOLIDAY_RANGES[i][0]);
@@ -214,36 +241,89 @@ body.embedded .app-head{display:none}
   /* =========================================================
    * 2. 状态
    * =======================================================*/
-  var STORE_KEY = 'workbuddy.timesheet.v1';
+  var STORE_KEY = 'workbuddy.timesheet.v2';
+  var OLD_KEY = 'workbuddy.timesheet.v1';
+  var PALETTE = ['#0f6e56', '#185fa5', '#9a5b00', '#7a3fa0', '#a32d2d', '#3b6d11', '#0e7490', '#8a4b2a'];
+  var TRAIN = '__training__';
+  var VAC = '__vacation__';
+  var TRAIN_LABEL = 'Training';
+  var VAC_LABEL = 'Vacation';
+  var MAX_H = 8;
+
   var state = {
     ym: '2026-10',
-    hours: 80,
-    project: 'Project',
+    projects: [
+      { id: 'p1', name: '项目A', hours: 40 },
+      { id: 'p2', name: '项目B', hours: 40 }
+    ],
     includeMakeup: false,
     overrides: Object.create(null),
     kindOverrides: Object.create(null),
     theme: 'light'
   };
 
+  function colorOf(pid) {
+    var i;
+    for (i = 0; i < state.projects.length; i++) if (state.projects[i].id === pid) return PALETTE[i % PALETTE.length];
+    return PALETTE[0];
+  }
+  function projectOf(pid) {
+    var i;
+    for (i = 0; i < state.projects.length; i++) if (state.projects[i].id === pid) return state.projects[i];
+    return null;
+  }
+  function labelOf(pid) {
+    if (pid === TRAIN) return TRAIN_LABEL;
+    if (pid === VAC) return VAC_LABEL;
+    var p = projectOf(pid);
+    return p ? p.name : pid;
+  }
+  function totalProjectHours() {
+    var s = 0, i;
+    for (i = 0; i < state.projects.length; i++) s += (state.projects[i].hours || 0);
+    return s;
+  }
+  function newId() {
+    return 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1000).toString(36);
+  }
+
   function save() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
-        ym: state.ym, hours: state.hours, project: state.project,
-        includeMakeup: state.includeMakeup, overrides: state.overrides,
-        kindOverrides: state.kindOverrides, theme: state.theme
+        ym: state.ym, projects: state.projects, includeMakeup: state.includeMakeup,
+        overrides: state.overrides, kindOverrides: state.kindOverrides, theme: state.theme
       }));
-    } catch (e) { /* 配额或隐私模式，忽略 */ }
+    } catch (e) { }
   }
 
   function load() {
-    var raw, obj;
-    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { return; }
-    if (!raw) return;
-    try { obj = JSON.parse(raw); } catch (e) { return; }
-    if (!obj || typeof obj !== 'object') return;
+    var raw = null, obj = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { }
+    if (raw) {
+      try { obj = JSON.parse(raw); } catch (e) { obj = null; }
+    }
+    if (!obj) {
+      /* 从单项目版本迁移 */
+      try { raw = localStorage.getItem(OLD_KEY); } catch (e) { raw = null; }
+      if (raw) {
+        try {
+          var old = JSON.parse(raw);
+          if (old && typeof old.hours === 'number') {
+            state.ym = old.ym || state.ym;
+            state.projects = [{ id: 'p1', name: 'Project', hours: old.hours }];
+            state.includeMakeup = !!old.includeMakeup;
+            state.theme = old.theme === 'dark' ? 'dark' : 'light';
+          }
+        } catch (e2) { }
+      }
+      return;
+    }
     if (typeof obj.ym === 'string' && /^\d{4}-\d{2}$/.test(obj.ym)) state.ym = obj.ym;
-    if (typeof obj.hours === 'number' && isFinite(obj.hours)) state.hours = obj.hours;
-    if (typeof obj.project === 'string') state.project = obj.project;
+    if (Array.isArray(obj.projects) && obj.projects.length) {
+      state.projects = obj.projects.filter(function (p) { return p && p.id; }).map(function (p) {
+        return { id: String(p.id), name: String(p.name || '未命名'), hours: Math.max(0, Math.round(+p.hours || 0)) };
+      });
+    }
     state.includeMakeup = !!obj.includeMakeup;
     if (obj.overrides && typeof obj.overrides === 'object') state.overrides = obj.overrides;
     if (obj.kindOverrides && typeof obj.kindOverrides === 'object') state.kindOverrides = obj.kindOverrides;
@@ -251,10 +331,9 @@ body.embedded .app-head{display:none}
   }
 
   /* =========================================================
-   * 3. 日期与星期
+   * 3. 日期
    * =======================================================*/
   var WEEK_CN = ['一', '二', '三', '四', '五', '六', '日'];
-
   function splitYM(ym) { var p = ym.split('-'); return { y: +p[0], m: +p[1] }; }
 
   function kindOf(dt) {
@@ -266,7 +345,6 @@ body.embedded .app-head{display:none}
     return (w === 0 || w === 6) ? 'weekend' : 'workday';
   }
 
-  /* 生成整月日期单元，含前后补位 */
   function buildMonth(ym) {
     var p = splitYM(ym), y = p.y, m = p.m;
     var first = new Date(y, m - 1, 1);
@@ -280,11 +358,7 @@ body.embedded .app-head{display:none}
     }
     for (d = 1; d <= total; d++) {
       dt = new Date(y, m - 1, d);
-      cells.push({
-        out: false, dt: dt, key: keyOf(dt), day: d,
-        kind: kindOf(dt),
-        week: Math.floor((offset + d - 1) / 7)
-      });
+      cells.push({ out: false, dt: dt, key: keyOf(dt), day: d, kind: kindOf(dt), week: Math.floor((offset + d - 1) / 7) });
     }
     while (cells.length % 7 !== 0) {
       dt = new Date(y, m - 1, total + (cells.length - offset - total) + 1);
@@ -294,299 +368,409 @@ body.embedded .app-head{display:none}
   }
 
   /* =========================================================
-   * 4. 分配算法
-   *    - 目标天数 = 总工时 / 8，按 4h 粒度
-   *    - 整天按自然周均分，余数从中间向两侧分配
-   *    - 半天追加在最后一个填报日之后
-   *    - 其余工作日 → Training，法定节假日 → Vacation
+   * 4. 分配：按项目定额连续铺排，日容量 8h
    * =======================================================*/
-  function middleFirstOrder(n) {
-    var idx = [], i;
-    for (i = 0; i < n; i++) idx.push(i);
-    idx.sort(function (a, b) {
-      var da = Math.abs(a - (n - 1) / 2), db = Math.abs(b - (n - 1) / 2);
-      if (da !== db) return da - db;
-      return a - b;
-    });
-    return idx;
-  }
-
-  function buildPlan(cells, hours, includeMakeup) {
+  function buildPlan(cells, projects, includeMakeup) {
     var plan = Object.create(null);
-    var alloc = [], i, c;
+    var pool = [], i, c;
 
     for (i = 0; i < cells.length; i++) {
       c = cells[i];
       if (c.out) continue;
-      if (c.kind === 'holiday') plan[c.key] = { assign: 'vacation', hours: 0 };
-      else if (c.kind === 'weekend') plan[c.key] = { assign: 'rest', hours: 0 };
-      else if (c.kind === 'makeup') plan[c.key] = { assign: 'training', hours: 0, makeup: true };
-      else plan[c.key] = { assign: 'training', hours: 0 };
-      if (c.kind === 'workday' || (c.kind === 'makeup' && includeMakeup)) alloc.push(c);
+      if (c.kind === 'holiday') plan[c.key] = { kind: 'vacation', slots: [] };
+      else if (c.kind === 'weekend') plan[c.key] = { kind: 'rest', slots: [] };
+      else plan[c.key] = { kind: 'training', slots: [] };
+      if (c.kind === 'workday' || (c.kind === 'makeup' && includeMakeup)) pool.push(c);
     }
 
-    var units = Math.round(Math.max(0, hours) / 4);
-    var whole = Math.floor(units / 2);
-    var half = units % 2;
-    var warn = [];
+    var cap = [], warn = [];
+    for (i = 0; i < pool.length; i++) cap.push(MAX_H);
 
-    if (whole > alloc.length) {
-      warn.push('本月可分配工作日仅 ' + alloc.length + ' 天，不足以容纳 ' + (hours / 8) + ' 天，已按 ' + alloc.length + ' 天分配。');
-      whole = alloc.length;
-      half = 0;
+    var capacity = pool.length * MAX_H;
+    var demand = 0;
+    for (i = 0; i < projects.length; i++) demand += Math.max(0, projects[i].hours || 0);
+    if (demand > capacity) {
+      warn.push('项目定额合计 ' + demand + 'h 超过本月容量 ' + capacity + 'h（' + pool.length + ' 个工作日）。');
     }
 
-    /* 按周分组 */
-    var byWeek = Object.create(null), weeks = [];
-    for (i = 0; i < alloc.length; i++) {
-      var w = alloc[i].week;
-      if (!byWeek[w]) { byWeek[w] = []; weeks.push(w); }
-      byWeek[w].push(alloc[i]);
-    }
-    weeks.sort(function (a, b) { return a - b; });
-
-    var W = weeks.length;
-    var counts = [], order, k;
-    for (i = 0; i < W; i++) counts.push(0);
-
-    if (W > 0 && whole > 0) {
-      var base = Math.floor(whole / W);
-      var rem = whole % W;
-      order = middleFirstOrder(W);
-      for (i = 0; i < W; i++) counts[i] = base;
-      for (i = 0; i < rem; i++) counts[order[i]] += 1;
-      /* 若某周容量不足，向后顺延 */
-      var overflow = 0;
-      for (i = 0; i < W; i++) {
-        var cap = byWeek[weeks[i]].length;
-        if (counts[i] > cap) { overflow += counts[i] - cap; counts[i] = cap; }
+    var ptr = 0, k, rem, take;
+    for (k = 0; k < projects.length; k++) {
+      rem = Math.max(0, projects[k].hours || 0);
+      while (rem > 0 && ptr < pool.length) {
+        if (cap[ptr] <= 0) { ptr++; continue; }
+        take = Math.min(rem, cap[ptr]);
+        plan[pool[ptr].key].slots.push({ id: projects[k].id, h: take });
+        cap[ptr] -= take;
+        rem -= take;
+        if (cap[ptr] === 0) ptr++;
       }
-      var pass = 0;
-      while (overflow > 0 && pass < W * 2) {
-        for (i = W - 1; i >= 0 && overflow > 0; i--) {
-          var room = byWeek[weeks[i]].length - counts[i];
-          if (room > 0) {
-            var add = Math.min(room, overflow);
-            counts[i] += add;
-            overflow -= add;
-          }
-        }
-        pass++;
-      }
-      if (overflow > 0) warn.push('部分工时未能排入，请检查该月工作日数量。');
+      if (rem > 0) warn.push('「' + projects[k].name + '」剩余 ' + rem + 'h 未能排入。');
     }
 
-    /* 周内从首个工作日连续填报 */
-    var lastAssigned = -1;
-    for (i = 0; i < W; i++) {
-      var list = byWeek[weeks[i]];
-      for (k = 0; k < counts[i] && k < list.length; k++) {
-        plan[list[k].key] = { assign: 'work', hours: 8 };
-        lastAssigned = alloc.indexOf(list[k]);
+    /* 日剩余补 Training；整天未用的工作日也标 Training */
+    for (i = 0; i < pool.length; i++) {
+      var key = pool[i].key;
+      var used = 0, j;
+      for (j = 0; j < plan[key].slots.length; j++) used += plan[key].slots[j].h;
+      if (used < MAX_H) plan[key].slots.push({ id: TRAIN, h: MAX_H - used });
+      plan[key].kind = plan[key].slots[0].id === TRAIN ? 'training' : 'work';
+    }
+
+    /* 未参与分配的调休上班日：整日 Training，但显示「调休」 */
+    for (i = 0; i < cells.length; i++) {
+      c = cells[i];
+      if (c.out || c.kind !== 'makeup') continue;
+      if (plan[c.key] && plan[c.key].slots.length === 0) {
+        plan[c.key].slots.push({ id: TRAIN, h: MAX_H });
+        plan[c.key].kind = 'training';
       }
     }
 
-    /* 半天 */
-    if (half) {
-      var target = null;
-      for (i = lastAssigned + 1; i < alloc.length; i++) {
-        if (plan[alloc[i].key].assign !== 'work') { target = alloc[i]; break; }
-      }
-      if (!target) {
-        for (i = alloc.length - 1; i >= 0; i--) {
-          if (plan[alloc[i].key].assign !== 'work') { target = alloc[i]; break; }
-        }
-      }
-      if (target) plan[target.key] = { assign: 'work', hours: 4 };
-      else warn.push('没有多余工作日承载 4h 余量，请调整总工时。');
-    }
-
-    return { plan: plan, warn: warn, allocCount: alloc.length, weeks: W };
+    return { plan: plan, warn: warn, poolSize: pool.length, capacity: capacity };
   }
 
   /* =========================================================
    * 5. 渲染
    * =======================================================*/
-  var el = {
-    cal: document.getElementById('cal'),
-    monthInput: document.getElementById('monthInput'),
-    hoursInput: document.getElementById('hoursInput'),
-    projInput: document.getElementById('projInput'),
-    optMakeup: document.getElementById('optMakeup'),
-    dayHint: document.getElementById('dayHint'),
-    stageTitle: document.getElementById('stageTitle'),
-    stageSub: document.getElementById('stageSub'),
-    stTarget: document.getElementById('stTarget'),
-    stAlloc: document.getElementById('stAlloc'),
-    stGap: document.getElementById('stGap'),
-    stTrain: document.getElementById('stTrain'),
-    stVac: document.getElementById('stVac'),
-    bar: document.getElementById('bar'),
-    barFill: document.getElementById('barFill'),
-    warn: document.getElementById('warn'),
-    footSource: document.getElementById('footSource'),
-    btnTheme: document.getElementById('btnTheme'),
-    toast: document.getElementById('toast')
-  };
+  var el = {};
+  ['cal', 'monthInput', 'projList', 'projHint', 'optMakeup', 'stageTitle', 'stageSub',
+    'stTarget', 'stAlloc', 'stGap', 'stTrain', 'stVac', 'bar', 'barFill', 'warn',
+    'footSource', 'btnTheme', 'toast', 'modal', 'mTitle', 'mSum', 'mRows'].forEach(function (id) {
+      el[id] = document.getElementById(id);
+    });
 
   var current = null;
 
-  function fmtDays(n) {
-    if (Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
-    return n.toFixed(1);
+  function fmtDays(h) {
+    var d = h / 8;
+    return Math.abs(d - Math.round(d)) < 1e-9 ? String(Math.round(d)) : d.toFixed(1);
+  }
+
+  function escAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function tint(hex, alpha) {
+    var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  function renderProjects() {
+    var html = [], i;
+    for (i = 0; i < state.projects.length; i++) {
+      var p = state.projects[i];
+      html.push(
+        '<div class="prow" data-id="' + p.id + '">' +
+          '<span class="dot" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
+          '<input class="pname" value="' + escAttr(p.name) + '" maxlength="16" aria-label="项目名称">' +
+          '<input class="num phours" type="number" min="0" max="400" step="1" value="' + p.hours + '" aria-label="项目工时">' +
+          '<button type="button" class="pdel" title="删除">×</button>' +
+        '</div>');
+    }
+    el.projList.innerHTML = html.join('');
+    el.projHint.textContent = '合计 ' + totalProjectHours() + 'h = ' + fmtDays(totalProjectHours()) + ' 天';
   }
 
   function render() {
     var p = splitYM(state.ym), y = p.y, m = p.m;
     var cells = buildMonth(state.ym);
-    var built = buildPlan(cells, state.hours, state.includeMakeup);
+    var built = buildPlan(cells, state.projects, state.includeMakeup);
     var plan = built.plan;
+    var i, j, kk, c;
 
-    /* 合并手动覆盖：{a:'work'|'training'|'vacation'|'rest', h:8|4|0} */
-    var i, c, kk;
+    /* 手动覆盖 */
     for (kk in state.overrides) {
       if (!Object.prototype.hasOwnProperty.call(state.overrides, kk)) continue;
       if (!plan[kk]) continue;
-      var v = state.overrides[kk];
-      if (typeof v === 'string') v = { a: v, h: v === 'work' ? 8 : 0 };
-      plan[kk] = { assign: v.a, hours: v.a === 'work' ? (v.h || 8) : 0 };
+      var ov = state.overrides[kk];
+      if (!Array.isArray(ov)) continue;
+      plan[kk] = { kind: 'work', slots: ov.map(function (s) { return { id: s.id, h: s.h }; }) };
+      recomputeKind(plan[kk]);
     }
 
     current = { cells: cells, plan: plan, built: built };
 
-    /* 表头 */
     var frag = [];
-    for (i = 0; i < 7; i++) frag.push('<div class="dow' + (i >= 5 ? ' we' : '') + '">' + WEEK_CN[i] + '</div>');
+    for (i = 0; i < 7; i++) frag.push('<div class="dow">' + WEEK_CN[i] + '</div>');
 
     var todayKey = keyOf(new Date());
-    var sumHours = 0, sumDays = 0, trainDays = 0, vacDays = 0, workDays = 0, makeupDays = 0;
+    var sumProject = 0, trainDays = 0, vacDays = 0, makeupDays = 0;
 
     for (i = 0; i < cells.length; i++) {
       c = cells[i];
       if (c.out) {
-        frag.push('<div class="day is-out"><span class="dn">' + c.day + '</span><span class="dt"></span></div>');
+        frag.push('<div class="day is-out"><span class="dn">' + c.day + '</span></div>');
         continue;
       }
-      var a = plan[c.key] || { assign: 'training', hours: 0 };
-      var cls = 'day', tag = '';
+      var a = plan[c.key] || { kind: 'training', slots: [] };
+      var cls = 'day', label = '', strip = '', titleParts = [], hasProject = false;
+      var used = 0;
 
-      if (a.assign === 'work') {
-        if (a.hours === 4) { cls += ' is-half'; tag = '4h'; } else { cls += ' is-work'; tag = '8h'; }
-        sumHours += a.hours; sumDays += a.hours / 8; workDays++;
-      } else if (a.assign === 'vacation') {
-        cls += ' is-hol'; tag = 'Vacation'; vacDays++;
-      } else if (a.assign === 'rest') {
-        cls += ' is-rest'; tag = '';
-      } else {
+      for (j = 0; j < a.slots.length; j++) {
+        if (a.slots[j].id !== TRAIN && a.slots[j].id !== VAC) hasProject = true;
+        titleParts.push(labelOf(a.slots[j].id) + ' ' + a.slots[j].h + 'h');
+      }
+
+      if (a.kind === 'rest') {
+        cls += ' is-rest';
+      } else if (a.kind === 'vacation') {
+        cls += ' is-hol'; label = VAC_LABEL; vacDays++;
+      } else if (!hasProject) {
         cls += ' is-train';
-        if (c.kind === 'makeup') { tag = '调休'; makeupDays++; } else { tag = 'Training'; }
+        if (c.kind === 'makeup') { label = '调休'; makeupDays++; } else { label = TRAIN_LABEL; }
         trainDays++;
+      } else {
+        var dom = null, domH = -1;
+        for (j = 0; j < a.slots.length; j++) {
+          var s = a.slots[j];
+          if (s.id === TRAIN || s.id === VAC) continue;
+          used += s.h;
+          if (s.h > domH) { domH = s.h; dom = s; }
+        }
+        var dcol = dom ? colorOf(dom.id) : '#0f6e56';
+        cls += ' is-work';
+        var style = 'background:' + tint(dcol, 0.12) + ';border-color:' + tint(dcol, 0.42) + ';';
+        var names = [];
+        for (j = 0; j < a.slots.length; j++) {
+          var sl = a.slots[j];
+          if (sl.id === TRAIN || sl.id === VAC) continue;
+          names.push(labelOf(sl.id));
+        }
+        label = names.length === 1 ? names[0] : (names[0] + ' +' + (names.length - 1));
+        if (label.length > 6) label = label.slice(0, 6);
+        for (j = 0; j < a.slots.length; j++) {
+          var sg = a.slots[j];
+          var col = (sg.id === TRAIN || sg.id === VAC) ? '#c9ced6' : colorOf(sg.id);
+          strip += '<i style="width:' + (sg.h / MAX_H * 100) + '%;background:' + col + '"></i>';
+        }
+        sumProject += used;
+        if (c.kind === 'makeup') cls += ' is-makeup';
+        if (c.key === todayKey) cls += ' is-today';
+        frag.push('<button type="button" class="' + cls + '" data-key="' + c.key + '" style="' + style + '" title="' + escAttr(titleParts.join(' / ')) + '">' +
+          '<span class="dn">' + c.day + '</span><span class="dt">' + escAttr(label) + '</span>' +
+          '<span class="strip">' + strip + '</span></button>');
+        continue;
       }
 
       if (c.kind === 'makeup') cls += ' is-makeup';
       if (c.key === todayKey) cls += ' is-today';
-
-      var aria = (m) + '月' + c.day + '日 周' + WEEK_CN[(c.dt.getDay() + 6) % 7] + ' ' + (tag || '休息');
-      frag.push('<button type="button" class="' + cls + '" data-key="' + c.key + '" aria-label="' + aria + '"><span class="dn">' + c.day + '</span><span class="dt">' + tag + '</span></button>');
+      var tt = titleParts.length ? titleParts.join(' / ') : '';
+      frag.push('<button type="button" class="' + cls + '" data-key="' + c.key + '"' + (tt ? ' title="' + escAttr(tt) + '"' : '') + '>' +
+        '<span class="dn">' + c.day + '</span>' + (label ? '<span class="dt">' + label + '</span>' : '') +
+        '</button>');
     }
 
     el.cal.innerHTML = frag.join('');
 
-    /* 顶部与统计 */
+    var target = totalProjectHours();
     el.stageTitle.textContent = y + ' 年 ' + m + ' 月';
-    el.stageSub.textContent = built.allocCount + ' 个可分配工作日 · 已填 ' + fmtDays(sumDays) + ' 天';
-    el.stTarget.textContent = fmtDays(state.hours / 8) + ' 天（' + state.hours + 'h）';
-    el.stAlloc.textContent = fmtDays(sumDays) + ' 天（' + sumHours + 'h）';
-    var gap = state.hours - sumHours;
-    el.stGap.textContent = (gap === 0 ? '0h' : (gap > 0 ? '缺 ' + gap + 'h' : '超 ' + (-gap) + 'h'));
+    el.stageSub.textContent = built.poolSize + ' 个可分配工作日 · 容量 ' + built.capacity + 'h';
+    el.stTarget.textContent = target + 'h · ' + fmtDays(target) + ' 天';
+    el.stAlloc.textContent = sumProject + 'h';
+    var gap = target - sumProject;
+    el.stGap.textContent = gap === 0 ? '0h' : (gap > 0 ? '缺 ' + gap + 'h' : '超 ' + (-gap) + 'h');
     el.stGap.className = gap === 0 ? 'ok' : 'bad';
     el.stTrain.textContent = trainDays + ' 天';
     el.stVac.textContent = vacDays + ' 天';
     document.getElementById('rowMakeup').style.display = makeupDays ? '' : 'none';
     document.getElementById('stMakeup').textContent = makeupDays + ' 天';
+    el.barFill.style.width = (target > 0 ? Math.min(100, sumProject / target * 100) : 0) + '%';
+    el.bar.className = 'bar' + (sumProject > target ? ' over' : '');
 
-    var pct = state.hours > 0 ? Math.min(100, sumHours / state.hours * 100) : 0;
-    el.barFill.style.width = pct + '%';
-    el.bar.className = 'bar' + (sumHours > state.hours ? ' over' : '');
-
-    /* 提示 */
     var warnList = built.warn.slice();
-    if (gap !== 0 && built.warn.length === 0) {
-      warnList.push(gap > 0 ? ('还差 ' + gap + 'h 未分配，可点击日期手动补足。') : ('已超出目标 ' + (-gap) + 'h，可点击日期改回 Training。'));
+    if (gap !== 0 && !warnList.length) {
+      warnList.push(gap > 0 ? ('还有 ' + gap + 'h 未排入，可点击日期手动补。') : ('已超排 ' + (-gap) + 'h。'));
     }
-    if (!KNOWN_YEARS[y]) {
-      warnList.push(y + ' 年节假日数据未内置，当前仅按周末计算；按住 Shift 点击日期可标记为节假日。');
-    }
+    if (!KNOWN_YEARS[y]) warnList.push(y + ' 年节假日数据未内置，当前仅按周末计算；Shift+点击日期可标记为节假日。');
     if (warnList.length) { el.warn.className = 'warnbox on'; el.warn.textContent = warnList.join(' '); }
     else { el.warn.className = 'warnbox'; el.warn.textContent = ''; }
 
-    el.dayHint.textContent = '折合 ' + fmtDays(state.hours / 8) + ' 天（每日 8h）';
-    el.footSource.textContent = KNOWN_YEARS[y] ? '节假日数据：国务院办公厅 2025-11-04 通知' : '节假日数据：未内置 ' + y + ' 年，按周末计算';
+    el.footSource.textContent = KNOWN_YEARS[y] ? '节假日数据：国务院办公厅 2025-11-04 通知' : '节假日数据：未内置 ' + y + ' 年';
+  }
+
+  function recomputeKind(entry) {
+    var has = false, i;
+    for (i = 0; i < entry.slots.length; i++) {
+      if (entry.slots[i].id !== TRAIN && entry.slots[i].id !== VAC) { has = true; break; }
+    }
+    entry.kind = has ? 'work' : (entry.slots.length && entry.slots[0].id === VAC ? 'vacation' : 'training');
   }
 
   /* =========================================================
-   * 6. 交互
+   * 6. 项目清单交互
    * =======================================================*/
-  function toast(msg) {
-    el.toast.textContent = msg;
-    el.toast.className = 'toast on';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(function () { el.toast.className = 'toast'; }, 1600);
+  el.projList.addEventListener('input', function (e) {
+    var row = e.target.closest('.prow');
+    if (!row) return;
+    var proj = projectOf(row.getAttribute('data-id'));
+    if (!proj) return;
+    if (e.target.classList.contains('pname')) {
+      proj.name = e.target.value || '未命名';
+      save();
+      return;
+    }
+    if (e.target.classList.contains('phours')) {
+      var v = parseFloat(e.target.value);
+      proj.hours = isFinite(v) && v > 0 ? Math.round(v) : 0;
+      el.projHint.textContent = '合计 ' + totalProjectHours() + 'h = ' + fmtDays(totalProjectHours()) + ' 天';
+      state.overrides = Object.create(null);
+      save(); render();
+    }
+  });
+
+  el.projList.addEventListener('blur', function (e) {
+    if (!e.target.classList || !e.target.classList.contains('pname')) return;
+    if (!e.target.value) { e.target.value = '未命名'; }
+    renderProjects(); render();
+  }, true);
+
+  el.projList.addEventListener('click', function (e) {
+    if (!e.target.classList.contains('pdel')) return;
+    var row = e.target.closest('.prow');
+    var id = row.getAttribute('data-id');
+    if (state.projects.length <= 1) { toast('至少保留一个项目'); return; }
+    state.projects = state.projects.filter(function (p) { return p.id !== id; });
+    state.overrides = Object.create(null);
+    save(); renderProjects(); render();
+  });
+
+  document.getElementById('btnAddProj').addEventListener('click', function () {
+    state.projects.push({ id: newId(), name: '项目' + String.fromCharCode(65 + state.projects.length), hours: 0 });
+    state.overrides = Object.create(null);
+    save(); renderProjects(); render();
+  });
+
+  /* =========================================================
+   * 7. 单日编辑
+   * =======================================================*/
+  var editing = null;
+
+  function renderEditorRows() {
+    var html = [], i;
+    var opts = [];
+    for (i = 0; i < state.projects.length; i++) {
+      opts.push('<option value="' + state.projects[i].id + '">' + escAttr(state.projects[i].name) + '</option>');
+    }
+    opts.push('<option value="' + TRAIN + '">' + TRAIN_LABEL + '</option>');
+    opts.push('<option value="' + VAC + '">' + VAC_LABEL + '</option>');
+    var base = opts.join('');
+
+    for (i = 0; i < editing.slots.length; i++) {
+      var s = editing.slots[i];
+      var sel = base.replace('value="' + s.id + '"', 'value="' + s.id + '" selected');
+      html.push('<div class="erow" data-i="' + i + '"><select>' + sel + '</select>' +
+        '<input type="number" min="0" max="8" step="1" value="' + s.h + '"><span class="u">h</span>' +
+        '<button type="button" class="rm" title="删除">×</button></div>');
+    }
+    el.mRows.innerHTML = html.join('');
+    updateEditorSum();
   }
 
-  function codeOf(a) {
-    if (!a) return 'training';
-    if (a.assign === 'work') return a.hours === 4 ? 'work4' : 'work8';
-    return a.assign;
+  function updateEditorSum() {
+    var sum = 0, i;
+    for (i = 0; i < editing.slots.length; i++) sum += editing.slots[i].h;
+    el.mSum.textContent = sum + 'h / ' + MAX_H + 'h';
+    el.mSum.className = 'sum' + (sum === MAX_H ? ' ok' : ' bad');
   }
 
-  function cycleList(kind) {
-    if (kind === 'weekend') return ['rest', 'work8'];
-    if (kind === 'holiday') return ['vacation', 'work8', 'training'];
-    return ['training', 'work8', 'work4', 'vacation'];
+  function openEditor(key) {
+    var entry = current.plan[key];
+    if (!entry) return;
+    editing = { key: key, slots: entry.slots.map(function (s) { return { id: s.id, h: s.h }; }) };
+    if (!editing.slots.length) {
+      editing.slots.push({ id: state.projects[0] ? state.projects[0].id : TRAIN, h: MAX_H });
+    }
+    var c = null, i;
+    for (i = 0; i < current.cells.length; i++) if (current.cells[i].key === key) { c = current.cells[i]; break; }
+    el.mTitle.textContent = splitYM(state.ym).m + ' 月 ' + (c ? c.day : '') + ' 日 · 周' + WEEK_CN[(c.dt.getDay() + 6) % 7];
+    renderEditorRows();
+    el.modal.classList.add('on');
   }
 
+  function closeEditor() {
+    el.modal.classList.remove('on');
+    editing = null;
+  }
+
+  el.mRows.addEventListener('input', function (e) {
+    var row = e.target.closest('.erow');
+    if (!row) return;
+    var i = +row.getAttribute('data-i');
+    if (e.target.tagName === 'SELECT') editing.slots[i].id = e.target.value;
+    else {
+      var v = parseInt(e.target.value, 10);
+      editing.slots[i].h = isFinite(v) ? Math.max(0, Math.min(MAX_H, v)) : 0;
+    }
+    updateEditorSum();
+  });
+
+  el.mRows.addEventListener('click', function (e) {
+    if (!e.target.classList.contains('rm')) return;
+    var i = +e.target.closest('.erow').getAttribute('data-i');
+    editing.slots.splice(i, 1);
+    if (!editing.slots.length) editing.slots.push({ id: state.projects[0] ? state.projects[0].id : TRAIN, h: 0 });
+    renderEditorRows();
+  });
+
+  document.getElementById('mAdd').addEventListener('click', function () {
+    var used = 0, i;
+    for (i = 0; i < editing.slots.length; i++) used += editing.slots[i].h;
+    editing.slots.push({ id: state.projects[0] ? state.projects[0].id : TRAIN, h: Math.max(0, MAX_H - used) });
+    renderEditorRows();
+  });
+
+  document.getElementById('mClear').addEventListener('click', function () {
+    editing.slots = [{ id: TRAIN, h: MAX_H }];
+    renderEditorRows();
+  });
+
+  document.getElementById('mCancel').addEventListener('click', closeEditor);
+  el.modal.addEventListener('click', function (e) {
+    if (e.target.getAttribute && e.target.getAttribute('data-close')) closeEditor();
+  });
+
+  document.getElementById('mOk').addEventListener('click', function () {
+    if (!editing) return;
+    var slots = editing.slots.filter(function (s) { return s.h > 0; });
+    var sum = 0, i;
+    for (i = 0; i < slots.length; i++) sum += slots[i].h;
+    if (sum > MAX_H) { toast('当日合计不能超过 ' + MAX_H + 'h'); return; }
+    state.overrides[editing.key] = slots;
+    save();
+    closeEditor();
+    render();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && el.modal.classList.contains('on')) closeEditor();
+  });
+
+  /* =========================================================
+   * 8. 日历交互
+   * =======================================================*/
   el.cal.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('.day') : null;
     if (!btn || !btn.dataset || !btn.dataset.key) return;
     if (btn.classList.contains('is-out')) return;
-
     var key = btn.dataset.key;
-    var cell = null, i;
-    for (i = 0; i < current.cells.length; i++) if (current.cells[i].key === key) { cell = current.cells[i]; break; }
-    if (!cell) return;
 
     if (e.shiftKey) {
+      var cell = null, i;
+      for (i = 0; i < current.cells.length; i++) if (current.cells[i].key === key) { cell = current.cells[i]; break; }
+      if (!cell) return;
       var kind = kindOf(cell.dt);
       state.kindOverrides[key] = (kind === 'holiday' || kind === 'weekend') ? 'workday' : 'holiday';
-      state.overrides[key] = state.kindOverrides[key] === 'holiday'
-        ? { a: 'vacation', h: 0 }
-        : { a: 'training', h: 0 };
+      delete state.overrides[key];
       save(); render();
       toast('已标记为' + (state.kindOverrides[key] === 'holiday' ? '节假日' : '工作日'));
       return;
     }
-
-    var cur = codeOf(current.plan[key]);
-    var list = cycleList(kindOf(cell.dt));
-    var idx = list.indexOf(cur);
-    var next = list[(idx + 1) % list.length];
-
-    if (next === 'work8') state.overrides[key] = { a: 'work', h: 8 };
-    else if (next === 'work4') state.overrides[key] = { a: 'work', h: 4 };
-    else state.overrides[key] = { a: next, h: 0 };
-
-    save(); render();
+    openEditor(key);
   });
 
-  el.monthInput.addEventListener('change', function () {
-    var v = el.monthInput.value;
-    if (!/^\d{4}-\d{2}$/.test(v)) return;
-    state.ym = v;
-    state.overrides = Object.create(null);
-    save(); render();
-  });
-
+  /* =========================================================
+   * 9. 其他控件
+   * =======================================================*/
   document.getElementById('btnPrev').addEventListener('click', function () { shiftMonth(-1); });
   document.getElementById('btnNext').addEventListener('click', function () { shiftMonth(1); });
 
@@ -598,17 +782,12 @@ body.embedded .app-head{display:none}
     save(); render();
   }
 
-  el.hoursInput.addEventListener('input', function () {
-    var v = parseFloat(el.hoursInput.value);
-    if (!isFinite(v) || v < 0) return;
-    state.hours = v;
+  el.monthInput.addEventListener('change', function () {
+    var v = el.monthInput.value;
+    if (!/^\d{4}-\d{2}$/.test(v)) return;
+    state.ym = v;
     state.overrides = Object.create(null);
     save(); render();
-  });
-
-  el.projInput.addEventListener('input', function () {
-    state.project = el.projInput.value.trim() || 'Project';
-    save();
   });
 
   el.optMakeup.addEventListener('change', function () {
@@ -620,7 +799,7 @@ body.embedded .app-head{display:none}
   document.getElementById('btnAuto').addEventListener('click', function () {
     state.overrides = Object.create(null);
     save(); render();
-    toast('已按自然周重新分配');
+    toast('已按项目定额重新排布');
   });
 
   document.getElementById('btnReset').addEventListener('click', function () {
@@ -630,17 +809,22 @@ body.embedded .app-head{display:none}
     toast('已清除所有手动调整');
   });
 
-  /* 导出 */
-  function rowsForExport() {
-    var out = [], i, c, a;
+  /* =========================================================
+   * 10. 导出（一天多行）
+   * =======================================================*/
+  function exportRows() {
+    var rows = [], i, j, c, a;
     for (i = 0; i < current.cells.length; i++) {
       c = current.cells[i];
       if (c.out) continue;
-      a = current.plan[c.key] || { assign: 'training', hours: 0 };
-      var name = a.assign === 'work' ? state.project : (a.assign === 'vacation' ? 'Vacation' : (a.assign === 'rest' ? '' : 'Training'));
-      out.push([c.key, '周' + WEEK_CN[(c.dt.getDay() + 6) % 7], name, a.assign === 'work' ? a.hours : 0]);
+      a = current.plan[c.key];
+      if (!a || !a.slots.length) continue;
+      for (j = 0; j < a.slots.length; j++) {
+        if (a.slots[j].h <= 0) continue;
+        rows.push([c.key, '周' + WEEK_CN[(c.dt.getDay() + 6) % 7], labelOf(a.slots[j].id), a.slots[j].h]);
+      }
     }
-    return out;
+    return rows;
   }
 
   function download(name, text) {
@@ -653,25 +837,21 @@ body.embedded .app-head{display:none}
   }
 
   document.getElementById('btnCsv').addEventListener('click', function () {
-    var rows = rowsForExport();
+    var rows = exportRows();
     var lines = ['日期,星期,项目,工时'];
     var i;
     for (i = 0; i < rows.length; i++) lines.push(rows[i].join(','));
     download('timesheet-' + state.ym + '.csv', lines.join('\r\n'));
-    toast('已导出 CSV');
+    toast('已导出 ' + rows.length + ' 行');
   });
 
   document.getElementById('btnCopy').addEventListener('click', function () {
-    var rows = rowsForExport();
-    var lines = ['日期\t星期\t项目\t工时'];
-    var i;
-    for (i = 0; i < rows.length; i++) {
-      if (!rows[i][2] && rows[i][3] === 0) continue;
-      lines.push(rows[i].join('\t'));
-    }
+    var rows = exportRows();
+    var lines = [], i;
+    for (i = 0; i < rows.length; i++) lines.push(rows[i].join('\t'));
     var text = lines.join('\n');
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () { toast('已复制 ' + (lines.length - 1) + ' 行'); },
+      navigator.clipboard.writeText(text).then(function () { toast('已复制 ' + rows.length + ' 行'); },
         function () { toast('复制失败，请改用导出 CSV'); });
     } else {
       var ta = document.createElement('textarea');
@@ -681,7 +861,13 @@ body.embedded .app-head{display:none}
     }
   });
 
-  /* 主题 */
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.className = 'toast on';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.toast.className = 'toast'; }, 1600);
+  }
+
   function applyTheme() {
     document.documentElement.setAttribute('data-theme', state.theme);
     el.btnTheme.textContent = state.theme === 'dark' ? '切换浅色' : '切换深色';
@@ -692,17 +878,19 @@ body.embedded .app-head{display:none}
   });
 
   /* =========================================================
-   * 7. 启动
+   * 11. 启动
    * =======================================================*/
   load();
   el.monthInput.value = state.ym;
-  el.hoursInput.value = state.hours;
-  el.projInput.value = state.project;
   el.optMakeup.checked = state.includeMakeup;
   applyTheme();
+  renderProjects();
   render();
 
-  window.__timesheet = { state: state, buildPlan: buildPlan, buildMonth: buildMonth, render: render };
+  window.__timesheet = {
+    state: state, buildPlan: buildPlan, buildMonth: buildMonth, render: render,
+    exportRows: exportRows, openEditor: openEditor, closeEditor: closeEditor
+  };
 })();
 </script>
 </body>
