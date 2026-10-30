@@ -29,19 +29,22 @@ html[data-theme="dark"]{
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
-.app-head{display:flex;align-items:center;gap:10px;padding:11px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.app-head{display:flex;align-items:center;gap:10px;padding:11px 20px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
 body.embedded .app-head{display:none}
 .app-head .logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
 .app-head .brand{font-weight:500}
 .app-head .back{margin-left:auto;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px}
-.layout{max-width:1500px;margin:0 auto;padding:18px 24px 30px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:900px){
-  .layout{grid-template-columns:1fr;padding:12px}
+.layout{flex:1;min-height:0;max-width:1500px;width:100%;margin:0 auto;padding:16px 24px 18px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}
+@media (max-width:1040px){ .layout{grid-template-columns:248px minmax(0,1fr);gap:14px;padding:14px 16px} }
+@media (max-width:860px){
+  body{overflow:auto}
+  .layout{grid-template-columns:1fr;height:auto;padding:12px}
   .side{position:static!important;max-height:none!important}
+  .stage{min-height:640px}
 }
-.side{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 14px;position:sticky;top:16px;max-height:calc(100vh - 44px);overflow:auto}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 14px;position:sticky;top:0;max-height:100%;overflow:auto}
 .fld{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
 .control{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:7px 9px;font-size:13.5px;outline:none}
 .control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -58,6 +61,8 @@ body.embedded .app-head{display:none}
 .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .sec-h span{font-size:12px;color:var(--muted)}
 .sec-h button{border:0;background:transparent;color:var(--accent);font-size:12px;cursor:pointer;padding:0}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:12px 10px;text-align:center;font-size:12px;color:var(--faint);line-height:1.7}
+.empty button{border:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;padding:0 3px;text-decoration:underline}
 .prow{display:grid;grid-template-columns:10px minmax(0,1fr) 56px 18px;gap:6px;align-items:center;margin-bottom:6px}
 .dot{width:10px;height:10px;border-radius:3px}
 .prow input{border:1px solid transparent;background:transparent;border-radius:5px;padding:4px 5px;font-size:13.5px;min-width:0;width:100%}
@@ -73,14 +78,14 @@ body.embedded .app-head{display:none}
 .bar{height:5px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:9px 0 3px}
 .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .18s ease}
 .bar.over i{background:var(--warn)}
-.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 17px;min-width:0}
-.stage-top{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 17px 0;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.stage-top{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;flex-wrap:wrap;flex:none}
 .stage-top h1{font-size:15px;font-weight:500;margin:0}
 .stage-top .sub{font-size:12px;color:var(--muted)}
 .stage-top .sp{flex:1}
-.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal{flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(70px,1fr);gap:6px;overflow:auto}
 .dow{font-size:11px;color:var(--faint);text-align:center;padding:0 0 4px}
-.day{position:relative;text-align:left;border:1px solid transparent;border-radius:9px;min-height:78px;padding:8px 9px 11px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;gap:2px;transition:box-shadow .12s;overflow:hidden}
+.day{position:relative;text-align:left;border:1px solid transparent;border-radius:9px;min-height:70px;padding:8px 9px 11px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;gap:2px;transition:box-shadow .12s;overflow:hidden}
 .day:hover{box-shadow:inset 0 0 0 2px var(--accent-soft)}
 .day .dn{font-size:14px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
 .day .dt{font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -97,7 +102,18 @@ body.embedded .app-head{display:none}
 .day.is-today{box-shadow:inset 0 0 0 2px var(--accent)}
 .day.is-out{background:transparent;border-color:transparent;cursor:default;opacity:.3}
 .day.is-out:hover{box-shadow:none}
-.stage-foot{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.summary{flex:none;margin-top:14px;padding:12px 0 0;border-top:1px solid var(--line-soft);max-height:38%;overflow:auto}
+.sum-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.sum-h b{font-size:12.5px;font-weight:500}
+.sum-h span{font-size:11.5px;color:var(--faint)}
+.sum-row{display:grid;grid-template-columns:10px minmax(90px,240px) 96px minmax(70px,1fr) 58px;gap:10px;align-items:center;font-size:12.5px;padding:5px 0}
+.sum-row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sum-row .hr{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.sum-row .track{height:7px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+.sum-row .track i{display:block;height:100%;border-radius:99px}
+.sum-row .dy{text-align:right;font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.sum-row.muted .nm,.sum-row.muted .hr,.sum-row.muted .dy{color:var(--muted)}
+.stage-foot{display:flex;align-items:center;gap:14px;margin-top:12px;padding:10px 0 13px;border-top:1px solid var(--line-soft);flex-wrap:wrap;font-size:11.5px;color:var(--muted);flex:none}
 .warnbox{display:none;margin-top:10px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.55}
 .warnbox.on{display:block}
 .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:30}
@@ -180,6 +196,7 @@ body.embedded .app-head{display:none}
       <span class="sub">点击日期编辑 · Shift+点击改日期类型</span>
     </div>
     <div class="cal" id="cal"></div>
+    <div class="summary" id="summary"></div>
     <div class="warnbox" id="warn"></div>
     <div class="stage-foot">
       <span id="footNote">按项目定额连续排布，整日填满后自动转入下一个项目。</span>
@@ -244,8 +261,8 @@ body.embedded .app-head{display:none}
   /* =========================================================
    * 2. 状态
    * =======================================================*/
-  var STORE_KEY = 'workbuddy.timesheet.v2';
-  var OLD_KEY = 'workbuddy.timesheet.v1';
+  var STORE_KEY = 'workbuddy.timesheet.v3';
+  var OLD_KEYS = ['workbuddy.timesheet.v2', 'workbuddy.timesheet.v1'];
   var PALETTE = ['#0f6e56', '#185fa5', '#9a5b00', '#7a3fa0', '#a32d2d', '#3b6d11', '#0e7490', '#8a4b2a'];
   var TRAIN = '__training__';
   var VAC = '__vacation__';
@@ -255,15 +272,32 @@ body.embedded .app-head{display:none}
 
   var state = {
     ym: '2026-10',
-    projects: [
-      { id: 'p1', name: '项目A', hours: 40 },
-      { id: 'p2', name: '项目B', hours: 40 }
-    ],
+    months: Object.create(null),
     includeMakeup: false,
-    overrides: Object.create(null),
-    kindOverrides: Object.create(null),
     theme: 'light'
   };
+
+  /* 每个月独立一份：项目清单、手动调整、日期类型覆盖 */
+  function bucket(ym) {
+    if (!state.months[ym]) {
+      state.months[ym] = { projects: [], overrides: Object.create(null), kindOverrides: Object.create(null) };
+    }
+    return state.months[ym];
+  }
+  function M() { return bucket(state.ym); }
+
+  Object.defineProperty(state, 'projects', {
+    get: function () { return M().projects; },
+    set: function (v) { M().projects = v; }
+  });
+  Object.defineProperty(state, 'overrides', {
+    get: function () { return M().overrides; },
+    set: function (v) { M().overrides = v; }
+  });
+  Object.defineProperty(state, 'kindOverrides', {
+    get: function () { return M().kindOverrides; },
+    set: function (v) { M().kindOverrides = v; }
+  });
 
   function colorOf(pid) {
     var i;
@@ -293,44 +327,75 @@ body.embedded .app-head{display:none}
   function save() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
-        ym: state.ym, projects: state.projects, includeMakeup: state.includeMakeup,
-        overrides: state.overrides, kindOverrides: state.kindOverrides, theme: state.theme
+        ym: state.ym, months: state.months, includeMakeup: state.includeMakeup, theme: state.theme
       }));
     } catch (e) { }
   }
 
+  function normalizeProjects(list) {
+    if (!Array.isArray(list)) return [];
+    return list.filter(function (p) { return p && p.id; }).map(function (p) {
+      return { id: String(p.id), name: String(p.name || '未命名'), hours: Math.max(0, Math.round(+p.hours || 0)) };
+    });
+  }
+
+  function readKey(k) {
+    var raw = null;
+    try { raw = localStorage.getItem(k); } catch (e) { return null; }
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
   function load() {
-    var raw = null, obj = null;
-    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { }
-    if (raw) {
-      try { obj = JSON.parse(raw); } catch (e) { obj = null; }
-    }
-    if (!obj) {
-      /* 从单项目版本迁移 */
-      try { raw = localStorage.getItem(OLD_KEY); } catch (e) { raw = null; }
-      if (raw) {
-        try {
-          var old = JSON.parse(raw);
-          if (old && typeof old.hours === 'number') {
-            state.ym = old.ym || state.ym;
-            state.projects = [{ id: 'p1', name: 'Project', hours: old.hours }];
-            state.includeMakeup = !!old.includeMakeup;
-            state.theme = old.theme === 'dark' ? 'dark' : 'light';
-          }
-        } catch (e2) { }
-      }
+    var obj = readKey(STORE_KEY);
+
+    if (obj && obj.months && typeof obj.months === 'object') {
+      if (typeof obj.ym === 'string' && /^\d{4}-\d{2}$/.test(obj.ym)) state.ym = obj.ym;
+      Object.keys(obj.months).forEach(function (ym) {
+        if (!/^\d{4}-\d{2}$/.test(ym)) return;
+        var b = obj.months[ym] || {};
+        state.months[ym] = {
+          projects: normalizeProjects(b.projects),
+          overrides: (b.overrides && typeof b.overrides === 'object') ? b.overrides : Object.create(null),
+          kindOverrides: (b.kindOverrides && typeof b.kindOverrides === 'object') ? b.kindOverrides : Object.create(null)
+        };
+      });
+      state.includeMakeup = !!obj.includeMakeup;
+      if (obj.theme === 'dark') state.theme = 'dark';
       return;
     }
-    if (typeof obj.ym === 'string' && /^\d{4}-\d{2}$/.test(obj.ym)) state.ym = obj.ym;
-    if (Array.isArray(obj.projects) && obj.projects.length) {
-      state.projects = obj.projects.filter(function (p) { return p && p.id; }).map(function (p) {
-        return { id: String(p.id), name: String(p.name || '未命名'), hours: Math.max(0, Math.round(+p.hours || 0)) };
-      });
+
+    /* v2：项目是全局的，迁到当前月份 */
+    var v2 = readKey(OLD_KEYS[0]);
+    if (v2 && Array.isArray(v2.projects)) {
+      var ym2 = /^\d{4}-\d{2}$/.test(v2.ym || '') ? v2.ym : state.ym;
+      state.ym = ym2;
+      state.months[ym2] = {
+        projects: normalizeProjects(v2.projects),
+        overrides: (v2.overrides && typeof v2.overrides === 'object') ? v2.overrides : Object.create(null),
+        kindOverrides: (v2.kindOverrides && typeof v2.kindOverrides === 'object') ? v2.kindOverrides : Object.create(null)
+      };
+      state.includeMakeup = !!v2.includeMakeup;
+      if (v2.theme === 'dark') state.theme = 'dark';
+      return;
     }
-    state.includeMakeup = !!obj.includeMakeup;
-    if (obj.overrides && typeof obj.overrides === 'object') state.overrides = obj.overrides;
-    if (obj.kindOverrides && typeof obj.kindOverrides === 'object') state.kindOverrides = obj.kindOverrides;
-    if (obj.theme === 'dark') state.theme = 'dark';
+
+    /* v1：单项目 */
+    var v1 = readKey(OLD_KEYS[1]);
+    if (v1 && typeof v1.hours === 'number') {
+      var ym1 = /^\d{4}-\d{2}$/.test(v1.ym || '') ? v1.ym : state.ym;
+      state.ym = ym1;
+      state.months[ym1] = {
+        projects: [{ id: 'p1', name: 'Project', hours: Math.max(0, Math.round(v1.hours)) }],
+        overrides: Object.create(null),
+        kindOverrides: Object.create(null)
+      };
+      state.includeMakeup = !!v1.includeMakeup;
+      if (v1.theme === 'dark') state.theme = 'dark';
+      return;
+    }
+
+    bucket(state.ym);
   }
 
   /* =========================================================
@@ -437,7 +502,7 @@ body.embedded .app-head{display:none}
    * =======================================================*/
   var el = {};
   ['cal', 'monthInput', 'projList', 'projHint', 'optMakeup', 'stageTitle', 'stageSub',
-    'stTarget', 'stAlloc', 'stGap', 'stTrain', 'stVac', 'bar', 'barFill', 'warn',
+    'stTarget', 'stAlloc', 'stGap', 'stTrain', 'stVac', 'bar', 'barFill', 'warn', 'summary',
     'footSource', 'btnTheme', 'toast', 'modal', 'mTitle', 'mSum', 'mRows'].forEach(function (id) {
       el[id] = document.getElementById(id);
     });
@@ -458,20 +523,55 @@ body.embedded .app-head{display:none}
     return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   }
 
+  function prevYm(ym) {
+    var p = splitYM(ym), d = new Date(p.y, p.m - 2, 1);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+  }
+
   function renderProjects() {
     var html = [], i;
-    for (i = 0; i < state.projects.length; i++) {
-      var p = state.projects[i];
-      html.push(
-        '<div class="prow" data-id="' + p.id + '">' +
-          '<span class="dot" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
-          '<input class="pname" value="' + escAttr(p.name) + '" maxlength="16" aria-label="项目名称">' +
-          '<input class="num phours" type="number" min="0" max="400" step="1" value="' + p.hours + '" aria-label="项目工时">' +
-          '<button type="button" class="pdel" title="删除">×</button>' +
+    if (!state.projects.length) {
+      var pv = prevYm(state.ym);
+      var hasPrev = state.months[pv] && state.months[pv].projects.length;
+      html.push('<div class="empty">本月还没有项目<br>' +
+        '<button type="button" data-act="add">添加项目</button>' +
+        (hasPrev ? '<button type="button" data-act="copy">沿用上月（' + splitYM(pv).m + ' 月）</button>' : '') +
         '</div>');
+    } else {
+      for (i = 0; i < state.projects.length; i++) {
+        var p = state.projects[i];
+        html.push(
+          '<div class="prow" data-id="' + p.id + '">' +
+            '<span class="dot" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
+            '<input class="pname" value="' + escAttr(p.name) + '" maxlength="16" aria-label="项目名称">' +
+            '<input class="num phours" type="number" min="0" max="400" step="1" value="' + p.hours + '" aria-label="项目工时">' +
+            '<button type="button" class="pdel" title="删除">×</button>' +
+          '</div>');
+      }
     }
     el.projList.innerHTML = html.join('');
-    el.projHint.textContent = '合计 ' + totalProjectHours() + 'h = ' + fmtDays(totalProjectHours()) + ' 天';
+    el.projHint.textContent = state.projects.length
+      ? '合计 ' + totalProjectHours() + 'h = ' + fmtDays(totalProjectHours()) + ' 天'
+      : '按月独立记录，填写后自动保存';
+  }
+
+  function addProject(hours) {
+    state.projects.push({
+      id: newId(),
+      name: '项目' + String.fromCharCode(65 + state.projects.length),
+      hours: hours || 0
+    });
+  }
+
+  function copyPrevMonth() {
+    var pv = state.months[prevYm(state.ym)];
+    if (!pv || !pv.projects.length) { toast('上月没有项目可沿用'); return; }
+    state.projects = pv.projects.map(function (p) {
+      return { id: newId(), name: p.name, hours: 0 };
+    });
+    state.overrides = Object.create(null);
+    save(); renderProjects(); render();
+    toast('已沿用上月 ' + pv.projects.length + ' 个项目，请填写工时');
   }
 
   function render() {
@@ -493,11 +593,24 @@ body.embedded .app-head{display:none}
 
     current = { cells: cells, plan: plan, built: built };
 
+    /* 汇总：按项目累计工时 */
+    var agg = Object.create(null), aggTrain = 0, aggVac = 0;
+    for (kk in plan) {
+      if (!Object.prototype.hasOwnProperty.call(plan, kk)) continue;
+      for (i = 0; i < plan[kk].slots.length; i++) {
+        var sg0 = plan[kk].slots[i];
+        if (sg0.id === TRAIN) aggTrain += sg0.h;
+        else if (sg0.id === VAC) aggVac += sg0.h;
+        else agg[sg0.id] = (agg[sg0.id] || 0) + sg0.h;
+      }
+    }
+
     var frag = [];
     for (i = 0; i < 7; i++) frag.push('<div class="dow">' + WEEK_CN[i] + '</div>');
 
     var todayKey = keyOf(new Date());
     var sumProject = 0, trainDays = 0, vacDays = 0, makeupDays = 0;
+    for (kk in agg) { if (Object.prototype.hasOwnProperty.call(agg, kk)) sumProject += agg[kk]; }
 
     for (i = 0; i < cells.length; i++) {
       c = cells[i];
@@ -507,7 +620,6 @@ body.embedded .app-head{display:none}
       }
       var a = plan[c.key] || { kind: 'training', slots: [] };
       var cls = 'day', label = '', strip = '', titleParts = [], hasProject = false;
-      var used = 0;
 
       for (j = 0; j < a.slots.length; j++) {
         if (a.slots[j].id !== TRAIN && a.slots[j].id !== VAC) hasProject = true;
@@ -527,7 +639,6 @@ body.embedded .app-head{display:none}
         for (j = 0; j < a.slots.length; j++) {
           var s = a.slots[j];
           if (s.id === TRAIN || s.id === VAC) continue;
-          used += s.h;
           if (s.h > domH) { domH = s.h; dom = s; }
         }
         var dcol = dom ? colorOf(dom.id) : '#0f6e56';
@@ -546,7 +657,6 @@ body.embedded .app-head{display:none}
           var col = (sg.id === TRAIN || sg.id === VAC) ? '#c9ced6' : colorOf(sg.id);
           strip += '<i style="width:' + (sg.h / MAX_H * 100) + '%;background:' + col + '"></i>';
         }
-        sumProject += used;
         if (c.kind === 'makeup') cls += ' is-makeup';
         if (c.key === todayKey) cls += ' is-today';
         frag.push('<button type="button" class="' + cls + '" data-key="' + c.key + '" style="' + style + '" title="' + escAttr(titleParts.join(' / ')) + '">' +
@@ -564,6 +674,7 @@ body.embedded .app-head{display:none}
     }
 
     el.cal.innerHTML = frag.join('');
+    renderSummary(agg, aggTrain);
 
     var target = totalProjectHours();
     el.stageTitle.textContent = y + ' 年 ' + m + ' 月';
@@ -581,6 +692,7 @@ body.embedded .app-head{display:none}
     el.bar.className = 'bar' + (sumProject > target ? ' over' : '');
 
     var warnList = built.warn.slice();
+    if (!state.projects.length) warnList.push('本月还没有项目，先在左侧「项目与定额」里添加，或点「沿用上月」。');
     if (gap !== 0 && !warnList.length) {
       warnList.push(gap > 0 ? ('还有 ' + gap + 'h 未排入，可点击日期手动补。') : ('已超排 ' + (-gap) + 'h。'));
     }
@@ -589,6 +701,50 @@ body.embedded .app-head{display:none}
     else { el.warn.className = 'warnbox'; el.warn.textContent = ''; }
 
     el.footSource.textContent = KNOWN_YEARS[y] ? '节假日数据：国务院办公厅 2025-11-04 通知' : '节假日数据：未内置 ' + y + ' 年';
+  }
+
+  function renderSummary(agg, trainH) {
+    var total = totalProjectHours();
+    var sum = 0, i;
+    var rows = [];
+
+    for (i = 0; i < state.projects.length; i++) {
+      var p = state.projects[i];
+      var h = agg[p.id] || 0;
+      sum += h;
+      var col = PALETTE[i % PALETTE.length];
+      var base = p.hours > 0 ? p.hours : (h || 1);
+      var pct = Math.min(100, h / base * 100);
+      rows.push('<div class="sum-row">' +
+        '<span class="dot" style="background:' + col + '"></span>' +
+        '<span class="nm" title="' + escAttr(p.name) + '">' + escAttr(p.name) + '</span>' +
+        '<span class="hr">' + h + ' / ' + p.hours + ' h</span>' +
+        '<span class="track"><i style="width:' + pct + '%;background:' + col + '"></i></span>' +
+        '<span class="dy">' + fmtDays(h) + ' 天</span>' +
+        '</div>');
+    }
+
+    if (!state.projects.length) {
+      rows.push('<div class="sum-row muted"><span class="dot" style="background:var(--line)"></span>' +
+        '<span class="nm">尚未设置项目</span><span class="hr">—</span>' +
+        '<span class="track"></span><span class="dy">—</span></div>');
+    }
+
+    if (trainH > 0) {
+      rows.push('<div class="sum-row muted">' +
+        '<span class="dot" style="background:#b8bfc8"></span>' +
+        '<span class="nm">Training</span>' +
+        '<span class="hr">' + trainH + ' h</span>' +
+        '<span class="track"><i style="width:100%;background:#b8bfc8"></i></span>' +
+        '<span class="dy">' + fmtDays(trainH) + ' 天</span>' +
+        '</div>');
+    }
+
+    var left = total - sum;
+    el.summary.innerHTML =
+      '<div class="sum-h"><b>项目分配</b><span>已排 ' + sum + 'h · 目标 ' + total + 'h · ' +
+      (left === 0 ? '差额 0h' : (left > 0 ? '待补 ' + left + 'h' : '超出 ' + (-left) + 'h')) +
+      '</span></div>' + rows.join('');
   }
 
   function recomputeKind(entry) {
@@ -628,17 +784,19 @@ body.embedded .app-head{display:none}
   }, true);
 
   el.projList.addEventListener('click', function (e) {
+    var act = e.target.getAttribute && e.target.getAttribute('data-act');
+    if (act === 'add') { addProject(0); state.overrides = Object.create(null); save(); renderProjects(); render(); return; }
+    if (act === 'copy') { copyPrevMonth(); return; }
     if (!e.target.classList.contains('pdel')) return;
     var row = e.target.closest('.prow');
     var id = row.getAttribute('data-id');
-    if (state.projects.length <= 1) { toast('至少保留一个项目'); return; }
     state.projects = state.projects.filter(function (p) { return p.id !== id; });
     state.overrides = Object.create(null);
     save(); renderProjects(); render();
   });
 
   document.getElementById('btnAddProj').addEventListener('click', function () {
-    state.projects.push({ id: newId(), name: '项目' + String.fromCharCode(65 + state.projects.length), hours: 0 });
+    addProject(0);
     state.overrides = Object.create(null);
     save(); renderProjects(); render();
   });
@@ -777,20 +935,22 @@ body.embedded .app-head{display:none}
   document.getElementById('btnPrev').addEventListener('click', function () { shiftMonth(-1); });
   document.getElementById('btnNext').addEventListener('click', function () { shiftMonth(1); });
 
+  function gotoMonth(ym) {
+    state.ym = ym;
+    bucket(ym);
+    el.monthInput.value = ym;
+    save(); renderProjects(); render();
+  }
+
   function shiftMonth(delta) {
     var p = splitYM(state.ym), d = new Date(p.y, p.m - 1 + delta, 1);
-    state.ym = d.getFullYear() + '-' + pad2(d.getMonth() + 1);
-    state.overrides = Object.create(null);
-    el.monthInput.value = state.ym;
-    save(); render();
+    gotoMonth(d.getFullYear() + '-' + pad2(d.getMonth() + 1));
   }
 
   el.monthInput.addEventListener('change', function () {
     var v = el.monthInput.value;
     if (!/^\d{4}-\d{2}$/.test(v)) return;
-    state.ym = v;
-    state.overrides = Object.create(null);
-    save(); render();
+    gotoMonth(v);
   });
 
   el.optMakeup.addEventListener('change', function () {
