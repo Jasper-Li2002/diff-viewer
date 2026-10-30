@@ -193,15 +193,39 @@ main{flex:1;min-height:0;position:relative}
     f.setAttribute('data-loaded', '1');
   }
 
-  function go(name, push) {
+  function urlFor(name) {
+    return name === 'home' ? location.pathname + location.search : '#' + name;
+  }
+
+  /* push：新增一条历史记录（浏览器后退可回到上一屏）；replace：改写当前记录，不留痕 */
+  function writeHistory(name, how) {
+    try {
+      if (how === 'push') history.pushState({ tab: name }, '', urlFor(name));
+      else history.replaceState({ tab: name }, '', urlFor(name));
+    } catch (e) {
+      /* file:// 下个别浏览器可能限制 pushState，退化为 hash 导航 */
+      try { location.hash = name === 'home' ? 'home' : name; } catch (e2) { }
+    }
+  }
+
+  function go(name, how) {
     if (!views[name]) name = 'home';
+    if (how === undefined) how = 'push';
+    var changed = current !== name;
     current = name;
     tabs.forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === name); });
     Object.keys(views).forEach(function (k) { views[k].classList.toggle('on', k === name); });
     if (name !== 'home') loadFrame(name);
-    if (push !== false) {
-      try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) { }
+    if (how === 'push') {
+      if (changed) writeHistory(name, 'push');
+    } else if (how === 'replace') {
+      writeHistory(name, 'replace');
     }
+  }
+
+  function syncFromUrl() {
+    var name = (location.hash || '').replace('#', '');
+    go(name && views[name] ? name : 'home', 'none');
   }
 
   tabs.forEach(function (t) {
@@ -225,8 +249,11 @@ main{flex:1;min-height:0;position:relative}
     storageSet(d.k, d.v);
   });
 
+  window.addEventListener('popstate', syncFromUrl);
+  window.addEventListener('hashchange', syncFromUrl);
+
   var hash = (location.hash || '').replace('#', '');
-  go(hash && views[hash] ? hash : 'home', false);
+  go(hash && views[hash] ? hash : 'home', 'none');
 
   window.__toolbox = {
     go: go,
