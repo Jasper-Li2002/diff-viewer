@@ -27,3 +27,6 @@ Desktop.ini
 .vscode/
 .idea/
 *.log
+
+# Build artifact manifest
+.build-manifest.json

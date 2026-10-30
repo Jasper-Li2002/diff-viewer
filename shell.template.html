@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>内部工具集 · 工时填报机 / 文本对比工具</title>
+<title>内部工具箱 · 工时填报机 / 文本对比工具</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%230C447C'%20stroke-width='2.2'%3E%3Crect%20x='3'%20y='3'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='14'%20y='3'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='3'%20y='14'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='14'%20y='14'%20width='7'%20height='7'%20rx='1.6'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -32,8 +32,6 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-
 .tab.on{background:var(--line-soft);color:var(--text);font-weight:500}
 .sp{flex:1}
 .ver{font-size:12px;color:var(--faint);white-space:nowrap}
-.ext{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;white-space:nowrap}
-.ext:hover{background:var(--line-soft)}
 main{flex:1;min-height:0;position:relative}
 .view{position:absolute;inset:0;display:none}
 .view.on{display:block}
@@ -43,7 +41,7 @@ main{flex:1;min-height:0;position:relative}
 .home h1{font-size:19px;font-weight:500;margin:0 0 6px}
 .home p.lead{font-size:13px;color:var(--muted);margin:0 0 22px}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:720px){ .cards{grid-template-columns:1fr} .tabs{gap:0} .tab{padding:6px 9px;font-size:12px} }
+@media (max-width:720px){ .cards{grid-template-columns:1fr} .tab{padding:6px 9px;font-size:12px} .ver{display:none} }
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px;display:flex;flex-direction:column;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:border-color .14s,transform .14s}
 .card:hover{border-color:var(--faint);transform:translateY(-1px)}
 .card .ch{display:flex;align-items:center;gap:10px;margin-bottom:11px}
@@ -55,13 +53,15 @@ main{flex:1;min-height:0;position:relative}
 .tag{font-size:11px;color:var(--muted);background:var(--line-soft);border-radius:5px;padding:2px 7px}
 .note{margin-top:20px;font-size:12px;color:var(--faint);line-height:1.7}
 .note code{font-family:ui-monospace,Consolas,monospace;background:var(--line-soft);border-radius:4px;padding:1px 5px}
+.err{display:none;margin:24px;background:#fff2f0;border:1px solid #ffccc7;color:#a8071a;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6}
+.err.on{display:block}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
     <span class="logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
-    <span>内部工具集</span>
+    <span>内部工具箱</span>
   </div>
   <nav class="tabs" role="tablist">
     <button class="tab on" data-tab="home" role="tab">首页</button>
@@ -69,8 +69,7 @@ main{flex:1;min-height:0;position:relative}
     <button class="tab" data-tab="diff" role="tab">文本对比工具</button>
   </nav>
   <span class="sp"></span>
-  <span class="ver">v1.1.0 · 离线可用</span>
-  <a class="ext" id="extLink" href="timesheet.html" target="_blank" rel="noopener">在新窗口打开</a>
+  <span class="ver" id="verLabel">单文件 · 离线可用</span>
 </header>
 
 <main>
@@ -78,7 +77,7 @@ main{flex:1;min-height:0;position:relative}
     <div class="home">
       <div class="home-inner">
         <h1>两个常用工具，都在本地跑</h1>
-        <p class="lead">不联网、不上传，粘贴的文本和填的工时都只留在本机浏览器里。</p>
+        <p class="lead">不联网、不上传，粘贴的文本和填的工时只留在本机浏览器里。整个工具箱就是一个文件，拷到哪里都能用。</p>
         <div class="cards">
           <button class="card" type="button" data-open="timesheet">
             <div class="ch">
@@ -109,17 +108,19 @@ main{flex:1;min-height:0;position:relative}
           </button>
         </div>
         <div class="note">
-          两个工具各自独立，互不影响。快捷键 <code>Alt + 1/2/3</code> 切换标签。<br>
-          文件结构：<code>index.html</code>（工具集）、<code>timesheet.html</code>、<code>diff-viewer.html</code>，三者放在同一目录即可。
+          两个工具各自独立运行，互不影响。快捷键 <code>Alt + 1/2/3</code> 切换标签。<br>
+          本文件已内置全部代码，<strong>不需要同目录下的其他文件</strong>，可直接发给同事。
         </div>
       </div>
     </div>
   </section>
 
-  <section class="view" id="view-timesheet"><iframe id="frTimesheet" title="工时填报机" src="about:blank" data-src="timesheet.html"></iframe></section>
-  <section class="view" id="view-diff"><iframe id="frDiff" title="文本对比工具" src="about:blank" data-src="diff-viewer.html"></iframe></section>
+  <section class="view" id="view-timesheet"><iframe id="frTimesheet" title="工时填报机"></iframe></section>
+  <section class="view" id="view-diff"><iframe id="frDiff" title="文本对比工具"></iframe></section>
+  <div class="err" id="errBox"></div>
 </main>
 
+<script id="bundle" type="application/json">__BUNDLE__</script>
 <script>
 (function () {
   'use strict';
@@ -130,18 +131,66 @@ main{flex:1;min-height:0;position:relative}
     timesheet: document.getElementById('view-timesheet'),
     diff: document.getElementById('view-diff')
   };
-  var frames = { timesheet: document.getElementById('frTimesheet'), diff: document.getElementById('frDiff') };
-  var extLink = document.getElementById('extLink');
-  var pages = { home: 'index.html', timesheet: 'timesheet.html', diff: 'diff-viewer.html' };
+  var frames = {
+    timesheet: document.getElementById('frTimesheet'),
+    diff: document.getElementById('frDiff')
+  };
+  var errBox = document.getElementById('errBox');
   var current = 'home';
+  var bundle;
+
+  try {
+    bundle = JSON.parse(document.getElementById('bundle').textContent);
+  } catch (e) {
+    bundle = null;
+    errBox.className = 'err on';
+    errBox.textContent = '内置代码解析失败：' + e.message;
+  }
+
+  function storageGet(k) {
+    try { return localStorage.getItem(k); } catch (e) { return null; }
+  }
+  function storageSet(k, v) {
+    try { localStorage.setItem(k, v); } catch (e) { /* file:// 或隐私模式，忽略 */ }
+  }
+
+  /* srcdoc 文档是 opaque origin，原生 localStorage 不可用。
+     注入一层内存实现，并把写入桥接回父页面，保证草稿仍能持久化。 */
+  function withStorageBridge(html) {
+    var seed = {};
+    var saved = storageGet('workbuddy.timesheet.v1');
+    if (saved) seed['workbuddy.timesheet.v1'] = saved;
+
+    var shim = '<scr' + 'ipt>(function(){' +
+      'var mem=' + JSON.stringify(seed) + ';' +
+      'function Api(){}' +
+      'Api.prototype.getItem=function(k){return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null;};' +
+      'Api.prototype.setItem=function(k,v){mem[k]=String(v);try{parent.postMessage({__tb:1,k:k,v:String(v)},"*");}catch(e){}};' +
+      'Api.prototype.removeItem=function(k){delete mem[k];};' +
+      'Api.prototype.clear=function(){mem={};};' +
+      'try{Object.defineProperty(window,"localStorage",{configurable:true,get:function(){return new Api();}});}catch(e){}' +
+      '})();</scr' + 'ipt>';
+
+    return html.replace('<head>', '<head>' + shim);
+  }
+
+  function docFor(name) {
+    if (!bundle || !bundle[name]) return '';
+    if (name === 'timesheet') return withStorageBridge(bundle[name]);
+    return bundle[name];
+  }
 
   function loadFrame(name) {
     var f = frames[name];
-    if (!f) return;
-    if (!f.getAttribute('data-loaded')) {
-      f.src = f.getAttribute('data-src');
-      f.setAttribute('data-loaded', '1');
+    if (!f || f.getAttribute('data-loaded')) return;
+    var doc = docFor(name);
+    if (!doc) {
+      errBox.className = 'err on';
+      errBox.textContent = '未找到「' + name + '」的内置代码，文件可能被截断。';
+      return;
     }
+    f.setAttribute('srcdoc', doc);
+    f.setAttribute('data-loaded', '1');
   }
 
   function go(name, push) {
@@ -150,8 +199,6 @@ main{flex:1;min-height:0;position:relative}
     tabs.forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === name); });
     Object.keys(views).forEach(function (k) { views[k].classList.toggle('on', k === name); });
     if (name !== 'home') loadFrame(name);
-    extLink.href = pages[name] || 'index.html';
-    extLink.textContent = name === 'home' ? '在新窗口打开' : '在新窗口打开';
     if (push !== false) {
       try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) { }
     }
@@ -172,10 +219,20 @@ main{flex:1;min-height:0;position:relative}
     else if (e.key === '3') { go('diff'); e.preventDefault(); }
   });
 
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || d.__tb !== 1) return;
+    storageSet(d.k, d.v);
+  });
+
   var hash = (location.hash || '').replace('#', '');
   go(hash && views[hash] ? hash : 'home', false);
 
-  window.__hub = { go: go, current: function () { return current; } };
+  window.__toolbox = {
+    go: go,
+    current: function () { return current; },
+    bundleSize: function () { return bundle ? (bundle.timesheet.length + bundle.diff.length) : 0; }
+  };
 })();
 </script>
 </body>
