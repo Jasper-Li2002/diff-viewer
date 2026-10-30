@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工时填报机 · 内部工具集</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%230F6E56'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='3'%20y='5'%20width='18'%20height='16'%20rx='3'/%3E%3Cpath%20d='M3%2010h18M8%203v4M16%203v4'/%3E%3Cpath%20d='M7.5%2014h4M7.5%2017h7'/%3E%3C/svg%3E">
+<style>
+:root{
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", Roboto, sans-serif;
+  --bg:#f5f6f8; --panel:#ffffff; --line:#e3e6ea; --line-soft:#eef0f3;
+  --text:#1f2328; --muted:#6b7280; --faint:#9aa1a8;
+  --accent:#0f6e56; --accent-ink:#ffffff; --accent-soft:#e8f6ef;
+  --work-bg:#e8f6ef; --work-line:#b7e3cc; --work-ink:#0f6e56;
+  --train-bg:#f7f8fa; --train-line:#e3e6ea; --train-ink:#3d4450; --train-tag:#8a9099;
+  --hol-bg:#f1f2f4; --hol-line:#e9ebee; --hol-ink:#9aa1a8; --hol-tag:#a8aeb5;
+  --rest-bg:#f7f7f8; --rest-line:#f0f1f3; --rest-ink:#b6bbc2;
+  --warn:#9a5b00; --warn-bg:#fdf4e5; --warn-line:#f0dcb8;
+  --radius:10px;
+}
+html[data-theme="dark"]{
+  --bg:#0d1117; --panel:#161b22; --line:#30363d; --line-soft:#222932;
+  --text:#e6edf3; --muted:#8b949e; --faint:#6e7681;
+  --accent:#2ea884; --accent-ink:#04140f; --accent-soft:#123326;
+  --work-bg:#123326; --work-line:#1f6b4a; --work-ink:#7fdda0;
+  --train-bg:#1a2029; --train-line:#2a323d; --train-ink:#c3ccd6; --train-tag:#8b949e;
+  --hol-bg:#1c222b; --hol-line:#262d36; --hol-ink:#8b949e; --hol-tag:#8b949e;
+  --rest-bg:#12171e; --rest-line:#1b222a; --rest-ink:#5c6672;
+  --warn:#e3b341; --warn-bg:#2b2213; --warn-line:#4a3a1c;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.app-head{display:flex;align-items:center;gap:10px;padding:11px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+body.embedded .app-head{display:none}
+.app-head .brand{display:flex;align-items:center;gap:8px;font-weight:500}
+.app-head .logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.app-head .back{margin-left:auto;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.app-head .back:hover{background:var(--line-soft)}
+.layout{display:grid;grid-template-columns:196px minmax(0,1fr);gap:16px;padding:16px 20px 26px;max-width:1180px;margin:0 auto;align-items:start}
+@media (max-width:840px){ .layout{grid-template-columns:1fr;padding:12px} .side{position:static!important} }
+.side{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;position:sticky;top:14px}
+.fld{display:block;font-size:11px;color:var(--muted);margin:0 0 4px}
+.control{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:6px 8px;font-size:13px;outline:none}
+.control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.mrow{display:flex;gap:6px;align-items:center}
+.arrow{width:28px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer;color:var(--muted)}
+.arrow:hover{background:var(--line-soft)}
+.hint{font-size:11px;color:var(--faint);margin:5px 0 12px;line-height:1.5}
+.btn{width:100%;border:1px solid transparent;border-radius:7px;padding:7px 0;font-size:12.5px;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-weight:500}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:var(--panel);border-color:var(--line);color:var(--text);font-weight:400}
+.btn.ghost:hover{background:var(--line-soft)}
+.btn+.btn{margin-top:6px}
+.stat{border-top:1px solid var(--line-soft);margin-top:12px;padding-top:9px}
+.srow{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)}
+.srow b{font-weight:500;color:var(--text);font-variant-numeric:tabular-nums}
+.srow b.ok{color:var(--work-ink)}
+.srow b.bad{color:var(--warn)}
+.bar{height:4px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:8px 0 2px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .18s ease}
+.bar.over i{background:var(--warn)}
+.legend{border-top:1px solid var(--line-soft);margin-top:11px;padding-top:9px}
+.lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-bottom:5px}
+.sw{width:11px;height:11px;border-radius:3px;flex:none;border:1px solid transparent}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px;min-width:0}
+.stage-top{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.stage-top h1{font-size:15px;font-weight:500;margin:0}
+.stage-top .sub{font-size:12px;color:var(--muted)}
+.stage-top .sp{flex:1}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.dow{font-size:11px;color:var(--faint);text-align:center;padding:0 0 4px}
+.dow.we{color:var(--faint)}
+.day{position:relative;text-align:left;border:1px solid transparent;border-radius:9px;min-height:58px;padding:6px 7px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:2px;transition:box-shadow .12s,transform .12s;overflow:hidden}
+.day:hover{box-shadow:inset 0 0 0 2px var(--accent-soft)}
+.day .dn{font-size:14px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.day .dt{font-size:11px;line-height:1.15;letter-spacing:-.1px}
+.day.is-work{background:var(--work-bg);border-color:var(--work-line)}
+.day.is-work .dn,.day.is-work .dt{color:var(--work-ink)}
+.day.is-half{background:var(--work-bg);border-color:var(--work-line);border-style:dashed}
+.day.is-half .dn,.day.is-half .dt{color:var(--work-ink)}
+.day.is-train{background:var(--train-bg);border-color:var(--train-line)}
+.day.is-train .dn{color:var(--train-ink)}
+.day.is-train .dt{color:var(--train-tag)}
+.day.is-hol{background:var(--hol-bg);border-color:var(--hol-line)}
+.day.is-hol .dn{color:var(--hol-ink)}
+.day.is-hol .dt{color:var(--hol-tag)}
+.day.is-rest{background:var(--rest-bg);border-color:var(--rest-line)}
+.day.is-rest .dn{color:var(--rest-ink)}
+.day.is-makeup{border-style:dashed;border-color:var(--faint)}
+.day.is-today{box-shadow:inset 0 0 0 2px var(--accent)}
+.day.is-out{background:transparent;border-color:transparent;cursor:default;opacity:.33}
+.day.is-out:hover{box-shadow:none}
+.day.is-out .dn{font-weight:400}
+.stage-foot{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.warnbox{display:none;margin-top:10px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.55}
+.warnbox.on{display:block}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);font-size:12.5px;padding:7px 14px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:20}
+.toast.on{opacity:.94;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header class="app-head">
+  <span class="logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+  <span class="brand">工时填报机</span>
+  <span style="font-size:12px;color:var(--muted)">月度工时自动分配</span>
+  <a class="back" href="index.html">返回工具集</a>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <label class="fld" for="monthInput">月份</label>
+    <div class="mrow">
+      <button class="arrow" id="btnPrev" type="button" title="上一月" aria-label="上一月">&#8249;</button>
+      <input class="control" id="monthInput" type="month" value="2026-10" style="text-align:center">
+      <button class="arrow" id="btnNext" type="button" title="下一月" aria-label="下一月">&#8250;</button>
+    </div>
+
+    <label class="fld" for="hoursInput" style="margin-top:12px">本月总工时</label>
+    <div class="mrow">
+      <input class="control" id="hoursInput" type="number" min="0" max="400" step="4" value="80" style="text-align:center;font-weight:500">
+      <span style="font-size:12px;color:var(--muted);flex:none">h</span>
+    </div>
+    <div class="hint" id="dayHint">折合 10 天（每日 8h）</div>
+
+    <label class="fld" for="projInput">项目名称</label>
+    <input class="control" id="projInput" type="text" value="Project" maxlength="24">
+
+    <div style="margin-top:11px">
+      <label class="lg" style="cursor:pointer;margin-bottom:8px"><input type="checkbox" id="optMakeup" style="margin:0 0 0 1px"> 调休上班日参与分配</label>
+      <button class="btn" id="btnAuto" type="button">自动分配</button>
+      <button class="btn ghost" id="btnReset" type="button">清除手动调整</button>
+    </div>
+
+    <div class="stat">
+      <div class="srow"><span>目标</span><b id="stTarget">80h · 10 天</b></div>
+      <div class="srow"><span>已分配</span><b id="stAlloc">80h · 10 天</b></div>
+      <div class="srow"><span>差额</span><b id="stGap" class="ok">0h</b></div>
+      <div class="bar" id="bar"><i id="barFill"></i></div>
+      <div class="srow"><span>Training</span><b id="stTrain">7 天</b></div>
+      <div class="srow" id="rowMakeup" style="display:none"><span>其中调休上班</span><b id="stMakeup">0 天</b></div>
+      <div class="srow"><span>Vacation</span><b id="stVac">7 天</b></div>
+    </div>
+
+    <div class="legend">
+      <div class="lg"><span class="sw" style="background:var(--work-bg);border-color:var(--work-line)"></span>填报工时</div>
+      <div class="lg"><span class="sw" style="background:var(--train-bg);border-color:var(--train-line)"></span>Training</div>
+      <div class="lg"><span class="sw" style="background:var(--hol-bg);border-color:var(--hol-line)"></span>Vacation</div>
+      <div class="lg"><span class="sw" style="background:transparent;border:1px dashed var(--faint)"></span>调休上班</div>
+    </div>
+
+    <div style="border-top:1px solid var(--line-soft);margin-top:10px;padding-top:10px">
+      <button class="btn ghost" id="btnCsv" type="button">导出 CSV</button>
+      <button class="btn ghost" id="btnCopy" type="button">复制为文本</button>
+      <button class="btn ghost" id="btnTheme" type="button">切换深色</button>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-top">
+      <h1 id="stageTitle">2026 年 10 月</h1>
+      <span class="sub" id="stageSub">17 个工作日 · 已分配 10 天</span>
+      <span class="sp"></span>
+      <span class="sub">点击日期切换 · Shift+点击改日期类型</span>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="warnbox" id="warn"></div>
+    <div class="stage-foot">
+      <span id="footNote">分配结果按自然周均分，周内从首个工作日连续填报。</span>
+      <span style="margin-left:auto" id="footSource">节假日数据：国务院办公厅 2025-11-04 通知</span>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  if (window.self !== window.top) document.body.classList.add('embedded');
+
+  /* =========================================================
+   * 1. 节假日数据（国务院办公厅《关于2026年部分节假日安排的通知》）
+   * =======================================================*/
+  var HOLIDAY_RANGES = [
+    ['2026-01-01', '2026-01-03'],
+    ['2026-02-15', '2026-02-23'],
+    ['2026-04-04', '2026-04-06'],
+    ['2026-05-01', '2026-05-05'],
+    ['2026-06-19', '2026-06-21'],
+    ['2026-09-25', '2026-09-27'],
+    ['2026-10-01', '2026-10-07']
+  ];
+  var MAKEUP_DAYS = ['2026-01-04', '2026-02-14', '2026-02-28', '2026-05-09', '2026-09-20', '2026-10-10'];
+  var HOLIDAY_SET = Object.create(null);
+  var MAKEUP_SET = Object.create(null);
+  var KNOWN_YEARS = { 2026: true };
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function keyOf(dt) { return dt.getFullYear() + '-' + pad2(dt.getMonth() + 1) + '-' + pad2(dt.getDate()); }
+  function parseKey(k) { var p = k.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+
+  (function buildSets() {
+    var i, d, end;
+    for (i = 0; i < HOLIDAY_RANGES.length; i++) {
+      d = parseKey(HOLIDAY_RANGES[i][0]);
+      end = parseKey(HOLIDAY_RANGES[i][1]);
+      while (d <= end) { HOLIDAY_SET[keyOf(d)] = true; d.setDate(d.getDate() + 1); }
+    }
+    for (i = 0; i < MAKEUP_DAYS.length; i++) MAKEUP_SET[MAKEUP_DAYS[i]] = true;
+  })();
+
+  /* =========================================================
+   * 2. 状态
+   * =======================================================*/
+  var STORE_KEY = 'workbuddy.timesheet.v1';
+  var state = {
+    ym: '2026-10',
+    hours: 80,
+    project: 'Project',
+    includeMakeup: false,
+    overrides: Object.create(null),
+    kindOverrides: Object.create(null),
+    theme: 'light'
+  };
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        ym: state.ym, hours: state.hours, project: state.project,
+        includeMakeup: state.includeMakeup, overrides: state.overrides,
+        kindOverrides: state.kindOverrides, theme: state.theme
+      }));
+    } catch (e) { /* 配额或隐私模式，忽略 */ }
+  }
+
+  function load() {
+    var raw, obj;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    try { obj = JSON.parse(raw); } catch (e) { return; }
+    if (!obj || typeof obj !== 'object') return;
+    if (typeof obj.ym === 'string' && /^\d{4}-\d{2}$/.test(obj.ym)) state.ym = obj.ym;
+    if (typeof obj.hours === 'number' && isFinite(obj.hours)) state.hours = obj.hours;
+    if (typeof obj.project === 'string') state.project = obj.project;
+    state.includeMakeup = !!obj.includeMakeup;
+    if (obj.overrides && typeof obj.overrides === 'object') state.overrides = obj.overrides;
+    if (obj.kindOverrides && typeof obj.kindOverrides === 'object') state.kindOverrides = obj.kindOverrides;
+    if (obj.theme === 'dark') state.theme = 'dark';
+  }
+
+  /* =========================================================
+   * 3. 日期与星期
+   * =======================================================*/
+  var WEEK_CN = ['一', '二', '三', '四', '五', '六', '日'];
+
+  function splitYM(ym) { var p = ym.split('-'); return { y: +p[0], m: +p[1] }; }
+
+  function kindOf(dt) {
+    var k = keyOf(dt);
+    if (state.kindOverrides[k]) return state.kindOverrides[k];
+    if (HOLIDAY_SET[k]) return 'holiday';
+    if (MAKEUP_SET[k]) return 'makeup';
+    var w = dt.getDay();
+    return (w === 0 || w === 6) ? 'weekend' : 'workday';
+  }
+
+  /* 生成整月日期单元，含前后补位 */
+  function buildMonth(ym) {
+    var p = splitYM(ym), y = p.y, m = p.m;
+    var first = new Date(y, m - 1, 1);
+    var offset = (first.getDay() + 6) % 7;
+    var total = new Date(y, m, 0).getDate();
+    var cells = [], i, d, dt;
+
+    for (i = 0; i < offset; i++) {
+      dt = new Date(y, m - 1, 1 - (offset - i));
+      cells.push({ out: true, dt: dt, key: keyOf(dt), day: dt.getDate(), kind: null, week: 0 });
+    }
+    for (d = 1; d <= total; d++) {
+      dt = new Date(y, m - 1, d);
+      cells.push({
+        out: false, dt: dt, key: keyOf(dt), day: d,
+        kind: kindOf(dt),
+        week: Math.floor((offset + d - 1) / 7)
+      });
+    }
+    while (cells.length % 7 !== 0) {
+      dt = new Date(y, m - 1, total + (cells.length - offset - total) + 1);
+      cells.push({ out: true, dt: dt, key: keyOf(dt), day: dt.getDate(), kind: null, week: 0 });
+    }
+    return cells;
+  }
+
+  /* =========================================================
+   * 4. 分配算法
+   *    - 目标天数 = 总工时 / 8，按 4h 粒度
+   *    - 整天按自然周均分，余数从中间向两侧分配
+   *    - 半天追加在最后一个填报日之后
+   *    - 其余工作日 → Training，法定节假日 → Vacation
+   * =======================================================*/
+  function middleFirstOrder(n) {
+    var idx = [], i;
+    for (i = 0; i < n; i++) idx.push(i);
+    idx.sort(function (a, b) {
+      var da = Math.abs(a - (n - 1) / 2), db = Math.abs(b - (n - 1) / 2);
+      if (da !== db) return da - db;
+      return a - b;
+    });
+    return idx;
+  }
+
+  function buildPlan(cells, hours, includeMakeup) {
+    var plan = Object.create(null);
+    var alloc = [], i, c;
+
+    for (i = 0; i < cells.length; i++) {
+      c = cells[i];
+      if (c.out) continue;
+      if (c.kind === 'holiday') plan[c.key] = { assign: 'vacation', hours: 0 };
+      else if (c.kind === 'weekend') plan[c.key] = { assign: 'rest', hours: 0 };
+      else if (c.kind === 'makeup') plan[c.key] = { assign: 'training', hours: 0, makeup: true };
+      else plan[c.key] = { assign: 'training', hours: 0 };
+      if (c.kind === 'workday' || (c.kind === 'makeup' && includeMakeup)) alloc.push(c);
+    }
+
+    var units = Math.round(Math.max(0, hours) / 4);
+    var whole = Math.floor(units / 2);
+    var half = units % 2;
+    var warn = [];
+
+    if (whole > alloc.length) {
+      warn.push('本月可分配工作日仅 ' + alloc.length + ' 天，不足以容纳 ' + (hours / 8) + ' 天，已按 ' + alloc.length + ' 天分配。');
+      whole = alloc.length;
+      half = 0;
+    }
+
+    /* 按周分组 */
+    var byWeek = Object.create(null), weeks = [];
+    for (i = 0; i < alloc.length; i++) {
+      var w = alloc[i].week;
+      if (!byWeek[w]) { byWeek[w] = []; weeks.push(w); }
+      byWeek[w].push(alloc[i]);
+    }
+    weeks.sort(function (a, b) { return a - b; });
+
+    var W = weeks.length;
+    var counts = [], order, k;
+    for (i = 0; i < W; i++) counts.push(0);
+
+    if (W > 0 && whole > 0) {
+      var base = Math.floor(whole / W);
+      var rem = whole % W;
+      order = middleFirstOrder(W);
+      for (i = 0; i < W; i++) counts[i] = base;
+      for (i = 0; i < rem; i++) counts[order[i]] += 1;
+      /* 若某周容量不足，向后顺延 */
+      var overflow = 0;
+      for (i = 0; i < W; i++) {
+        var cap = byWeek[weeks[i]].length;
+        if (counts[i] > cap) { overflow += counts[i] - cap; counts[i] = cap; }
+      }
+      var pass = 0;
+      while (overflow > 0 && pass < W * 2) {
+        for (i = W - 1; i >= 0 && overflow > 0; i--) {
+          var room = byWeek[weeks[i]].length - counts[i];
+          if (room > 0) {
+            var add = Math.min(room, overflow);
+            counts[i] += add;
+            overflow -= add;
+          }
+        }
+        pass++;
+      }
+      if (overflow > 0) warn.push('部分工时未能排入，请检查该月工作日数量。');
+    }
+
+    /* 周内从首个工作日连续填报 */
+    var lastAssigned = -1;
+    for (i = 0; i < W; i++) {
+      var list = byWeek[weeks[i]];
+      for (k = 0; k < counts[i] && k < list.length; k++) {
+        plan[list[k].key] = { assign: 'work', hours: 8 };
+        lastAssigned = alloc.indexOf(list[k]);
+      }
+    }
+
+    /* 半天 */
+    if (half) {
+      var target = null;
+      for (i = lastAssigned + 1; i < alloc.length; i++) {
+        if (plan[alloc[i].key].assign !== 'work') { target = alloc[i]; break; }
+      }
+      if (!target) {
+        for (i = alloc.length - 1; i >= 0; i--) {
+          if (plan[alloc[i].key].assign !== 'work') { target = alloc[i]; break; }
+        }
+      }
+      if (target) plan[target.key] = { assign: 'work', hours: 4 };
+      else warn.push('没有多余工作日承载 4h 余量，请调整总工时。');
+    }
+
+    return { plan: plan, warn: warn, allocCount: alloc.length, weeks: W };
+  }
+
+  /* =========================================================
+   * 5. 渲染
+   * =======================================================*/
+  var el = {
+    cal: document.getElementById('cal'),
+    monthInput: document.getElementById('monthInput'),
+    hoursInput: document.getElementById('hoursInput'),
+    projInput: document.getElementById('projInput'),
+    optMakeup: document.getElementById('optMakeup'),
+    dayHint: document.getElementById('dayHint'),
+    stageTitle: document.getElementById('stageTitle'),
+    stageSub: document.getElementById('stageSub'),
+    stTarget: document.getElementById('stTarget'),
+    stAlloc: document.getElementById('stAlloc'),
+    stGap: document.getElementById('stGap'),
+    stTrain: document.getElementById('stTrain'),
+    stVac: document.getElementById('stVac'),
+    bar: document.getElementById('bar'),
+    barFill: document.getElementById('barFill'),
+    warn: document.getElementById('warn'),
+    footSource: document.getElementById('footSource'),
+    btnTheme: document.getElementById('btnTheme'),
+    toast: document.getElementById('toast')
+  };
+
+  var current = null;
+
+  function fmtDays(n) {
+    if (Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
+    return n.toFixed(1);
+  }
+
+  function render() {
+    var p = splitYM(state.ym), y = p.y, m = p.m;
+    var cells = buildMonth(state.ym);
+    var built = buildPlan(cells, state.hours, state.includeMakeup);
+    var plan = built.plan;
+
+    /* 合并手动覆盖：{a:'work'|'training'|'vacation'|'rest', h:8|4|0} */
+    var i, c, kk;
+    for (kk in state.overrides) {
+      if (!Object.prototype.hasOwnProperty.call(state.overrides, kk)) continue;
+      if (!plan[kk]) continue;
+      var v = state.overrides[kk];
+      if (typeof v === 'string') v = { a: v, h: v === 'work' ? 8 : 0 };
+      plan[kk] = { assign: v.a, hours: v.a === 'work' ? (v.h || 8) : 0 };
+    }
+
+    current = { cells: cells, plan: plan, built: built };
+
+    /* 表头 */
+    var frag = [];
+    for (i = 0; i < 7; i++) frag.push('<div class="dow' + (i >= 5 ? ' we' : '') + '">' + WEEK_CN[i] + '</div>');
+
+    var todayKey = keyOf(new Date());
+    var sumHours = 0, sumDays = 0, trainDays = 0, vacDays = 0, workDays = 0, makeupDays = 0;
+
+    for (i = 0; i < cells.length; i++) {
+      c = cells[i];
+      if (c.out) {
+        frag.push('<div class="day is-out"><span class="dn">' + c.day + '</span><span class="dt"></span></div>');
+        continue;
+      }
+      var a = plan[c.key] || { assign: 'training', hours: 0 };
+      var cls = 'day', tag = '';
+
+      if (a.assign === 'work') {
+        if (a.hours === 4) { cls += ' is-half'; tag = '4h'; } else { cls += ' is-work'; tag = '8h'; }
+        sumHours += a.hours; sumDays += a.hours / 8; workDays++;
+      } else if (a.assign === 'vacation') {
+        cls += ' is-hol'; tag = 'Vacation'; vacDays++;
+      } else if (a.assign === 'rest') {
+        cls += ' is-rest'; tag = '';
+      } else {
+        cls += ' is-train';
+        if (c.kind === 'makeup') { tag = '调休'; makeupDays++; } else { tag = 'Training'; }
+        trainDays++;
+      }
+
+      if (c.kind === 'makeup') cls += ' is-makeup';
+      if (c.key === todayKey) cls += ' is-today';
+
+      var aria = (m) + '月' + c.day + '日 周' + WEEK_CN[(c.dt.getDay() + 6) % 7] + ' ' + (tag || '休息');
+      frag.push('<button type="button" class="' + cls + '" data-key="' + c.key + '" aria-label="' + aria + '"><span class="dn">' + c.day + '</span><span class="dt">' + tag + '</span></button>');
+    }
+
+    el.cal.innerHTML = frag.join('');
+
+    /* 顶部与统计 */
+    el.stageTitle.textContent = y + ' 年 ' + m + ' 月';
+    el.stageSub.textContent = built.allocCount + ' 个可分配工作日 · 已填 ' + fmtDays(sumDays) + ' 天';
+    el.stTarget.textContent = fmtDays(state.hours / 8) + ' 天（' + state.hours + 'h）';
+    el.stAlloc.textContent = fmtDays(sumDays) + ' 天（' + sumHours + 'h）';
+    var gap = state.hours - sumHours;
+    el.stGap.textContent = (gap === 0 ? '0h' : (gap > 0 ? '缺 ' + gap + 'h' : '超 ' + (-gap) + 'h'));
+    el.stGap.className = gap === 0 ? 'ok' : 'bad';
+    el.stTrain.textContent = trainDays + ' 天';
+    el.stVac.textContent = vacDays + ' 天';
+    document.getElementById('rowMakeup').style.display = makeupDays ? '' : 'none';
+    document.getElementById('stMakeup').textContent = makeupDays + ' 天';
+
+    var pct = state.hours > 0 ? Math.min(100, sumHours / state.hours * 100) : 0;
+    el.barFill.style.width = pct + '%';
+    el.bar.className = 'bar' + (sumHours > state.hours ? ' over' : '');
+
+    /* 提示 */
+    var warnList = built.warn.slice();
+    if (gap !== 0 && built.warn.length === 0) {
+      warnList.push(gap > 0 ? ('还差 ' + gap + 'h 未分配，可点击日期手动补足。') : ('已超出目标 ' + (-gap) + 'h，可点击日期改回 Training。'));
+    }
+    if (!KNOWN_YEARS[y]) {
+      warnList.push(y + ' 年节假日数据未内置，当前仅按周末计算；按住 Shift 点击日期可标记为节假日。');
+    }
+    if (warnList.length) { el.warn.className = 'warnbox on'; el.warn.textContent = warnList.join(' '); }
+    else { el.warn.className = 'warnbox'; el.warn.textContent = ''; }
+
+    el.dayHint.textContent = '折合 ' + fmtDays(state.hours / 8) + ' 天（每日 8h）';
+    el.footSource.textContent = KNOWN_YEARS[y] ? '节假日数据：国务院办公厅 2025-11-04 通知' : '节假日数据：未内置 ' + y + ' 年，按周末计算';
+  }
+
+  /* =========================================================
+   * 6. 交互
+   * =======================================================*/
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.className = 'toast on';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.toast.className = 'toast'; }, 1600);
+  }
+
+  function codeOf(a) {
+    if (!a) return 'training';
+    if (a.assign === 'work') return a.hours === 4 ? 'work4' : 'work8';
+    return a.assign;
+  }
+
+  function cycleList(kind) {
+    if (kind === 'weekend') return ['rest', 'work8'];
+    if (kind === 'holiday') return ['vacation', 'work8', 'training'];
+    return ['training', 'work8', 'work4', 'vacation'];
+  }
+
+  el.cal.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.day') : null;
+    if (!btn || !btn.dataset || !btn.dataset.key) return;
+    if (btn.classList.contains('is-out')) return;
+
+    var key = btn.dataset.key;
+    var cell = null, i;
+    for (i = 0; i < current.cells.length; i++) if (current.cells[i].key === key) { cell = current.cells[i]; break; }
+    if (!cell) return;
+
+    if (e.shiftKey) {
+      var kind = kindOf(cell.dt);
+      state.kindOverrides[key] = (kind === 'holiday' || kind === 'weekend') ? 'workday' : 'holiday';
+      state.overrides[key] = state.kindOverrides[key] === 'holiday'
+        ? { a: 'vacation', h: 0 }
+        : { a: 'training', h: 0 };
+      save(); render();
+      toast('已标记为' + (state.kindOverrides[key] === 'holiday' ? '节假日' : '工作日'));
+      return;
+    }
+
+    var cur = codeOf(current.plan[key]);
+    var list = cycleList(kindOf(cell.dt));
+    var idx = list.indexOf(cur);
+    var next = list[(idx + 1) % list.length];
+
+    if (next === 'work8') state.overrides[key] = { a: 'work', h: 8 };
+    else if (next === 'work4') state.overrides[key] = { a: 'work', h: 4 };
+    else state.overrides[key] = { a: next, h: 0 };
+
+    save(); render();
+  });
+
+  el.monthInput.addEventListener('change', function () {
+    var v = el.monthInput.value;
+    if (!/^\d{4}-\d{2}$/.test(v)) return;
+    state.ym = v;
+    state.overrides = Object.create(null);
+    save(); render();
+  });
+
+  document.getElementById('btnPrev').addEventListener('click', function () { shiftMonth(-1); });
+  document.getElementById('btnNext').addEventListener('click', function () { shiftMonth(1); });
+
+  function shiftMonth(delta) {
+    var p = splitYM(state.ym), d = new Date(p.y, p.m - 1 + delta, 1);
+    state.ym = d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+    state.overrides = Object.create(null);
+    el.monthInput.value = state.ym;
+    save(); render();
+  }
+
+  el.hoursInput.addEventListener('input', function () {
+    var v = parseFloat(el.hoursInput.value);
+    if (!isFinite(v) || v < 0) return;
+    state.hours = v;
+    state.overrides = Object.create(null);
+    save(); render();
+  });
+
+  el.projInput.addEventListener('input', function () {
+    state.project = el.projInput.value.trim() || 'Project';
+    save();
+  });
+
+  el.optMakeup.addEventListener('change', function () {
+    state.includeMakeup = el.optMakeup.checked;
+    state.overrides = Object.create(null);
+    save(); render();
+  });
+
+  document.getElementById('btnAuto').addEventListener('click', function () {
+    state.overrides = Object.create(null);
+    save(); render();
+    toast('已按自然周重新分配');
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    state.overrides = Object.create(null);
+    state.kindOverrides = Object.create(null);
+    save(); render();
+    toast('已清除所有手动调整');
+  });
+
+  /* 导出 */
+  function rowsForExport() {
+    var out = [], i, c, a;
+    for (i = 0; i < current.cells.length; i++) {
+      c = current.cells[i];
+      if (c.out) continue;
+      a = current.plan[c.key] || { assign: 'training', hours: 0 };
+      var name = a.assign === 'work' ? state.project : (a.assign === 'vacation' ? 'Vacation' : (a.assign === 'rest' ? '' : 'Training'));
+      out.push([c.key, '周' + WEEK_CN[(c.dt.getDay() + 6) % 7], name, a.assign === 'work' ? a.hours : 0]);
+    }
+    return out;
+  }
+
+  function download(name, text) {
+    var blob = new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+  }
+
+  document.getElementById('btnCsv').addEventListener('click', function () {
+    var rows = rowsForExport();
+    var lines = ['日期,星期,项目,工时'];
+    var i;
+    for (i = 0; i < rows.length; i++) lines.push(rows[i].join(','));
+    download('timesheet-' + state.ym + '.csv', lines.join('\r\n'));
+    toast('已导出 CSV');
+  });
+
+  document.getElementById('btnCopy').addEventListener('click', function () {
+    var rows = rowsForExport();
+    var lines = ['日期\t星期\t项目\t工时'];
+    var i;
+    for (i = 0; i < rows.length; i++) {
+      if (!rows[i][2] && rows[i][3] === 0) continue;
+      lines.push(rows[i].join('\t'));
+    }
+    var text = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast('已复制 ' + (lines.length - 1) + ' 行'); },
+        function () { toast('复制失败，请改用导出 CSV'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); toast('已复制'); } catch (e) { toast('复制失败'); }
+      ta.remove();
+    }
+  });
+
+  /* 主题 */
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', state.theme);
+    el.btnTheme.textContent = state.theme === 'dark' ? '切换浅色' : '切换深色';
+  }
+  el.btnTheme.addEventListener('click', function () {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(); save();
+  });
+
+  /* =========================================================
+   * 7. 启动
+   * =======================================================*/
+  load();
+  el.monthInput.value = state.ym;
+  el.hoursInput.value = state.hours;
+  el.projInput.value = state.project;
+  el.optMakeup.checked = state.includeMakeup;
+  applyTheme();
+  render();
+
+  window.__timesheet = { state: state, buildPlan: buildPlan, buildMonth: buildMonth, render: render };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>内部工具集 · 工时填报机 / 文本对比工具</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%230C447C'%20stroke-width='2.2'%3E%3Crect%20x='3'%20y='3'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='14'%20y='3'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='3'%20y='14'%20width='7'%20height='7'%20rx='1.6'/%3E%3Crect%20x='14'%20y='14'%20width='7'%20height='7'%20rx='1.6'/%3E%3C/svg%3E">
+<style>
+:root{
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", Roboto, sans-serif;
+  --bg:#f5f6f8; --panel:#ffffff; --line:#e3e6ea; --line-soft:#eef0f3;
+  --text:#1f2328; --muted:#6b7280; --faint:#9aa1a8;
+  --brand:#0c447c;
+  --teal-bg:#e8f6ef; --teal-ink:#0f6e56;
+  --blue-bg:#e6f1fb; --blue-ink:#185fa5;
+}
+html[data-theme="dark"]{
+  --bg:#0d1117; --panel:#161b22; --line:#30363d; --line-soft:#222932;
+  --text:#e6edf3; --muted:#8b949e; --faint:#6e7681;
+  --teal-bg:#123326; --teal-ink:#7fdda0;
+  --blue-bg:#10243b; --blue-ink:#85b7eb;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
+.top{display:flex;align-items:center;gap:14px;padding:9px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+.brand{display:flex;align-items:center;gap:8px;font-weight:500;font-size:14px;white-space:nowrap}
+.logo{width:24px;height:24px;border-radius:7px;background:var(--brand);display:flex;align-items:center;justify-content:center;flex:none}
+.tabs{display:flex;align-items:center;gap:2px}
+.tab{border:0;background:transparent;color:var(--muted);font-size:13px;padding:6px 13px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.tab:hover{background:var(--line-soft);color:var(--text)}
+.tab.on{background:var(--line-soft);color:var(--text);font-weight:500}
+.sp{flex:1}
+.ver{font-size:12px;color:var(--faint);white-space:nowrap}
+.ext{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;white-space:nowrap}
+.ext:hover{background:var(--line-soft)}
+main{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:none}
+.view.on{display:block}
+.view iframe{width:100%;height:100%;border:0;display:block;background:var(--bg)}
+.home{height:100%;overflow:auto;padding:30px 24px 40px}
+.home-inner{max-width:840px;margin:0 auto}
+.home h1{font-size:19px;font-weight:500;margin:0 0 6px}
+.home p.lead{font-size:13px;color:var(--muted);margin:0 0 22px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){ .cards{grid-template-columns:1fr} .tabs{gap:0} .tab{padding:6px 9px;font-size:12px} }
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px;display:flex;flex-direction:column;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:border-color .14s,transform .14s}
+.card:hover{border-color:var(--faint);transform:translateY(-1px)}
+.card .ch{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+.card h2{font-size:14.5px;font-weight:500;margin:0}
+.card .sub{font-size:12px;color:var(--muted);margin-top:1px}
+.card p{font-size:12.5px;line-height:1.62;color:var(--muted);margin:0}
+.tags{display:flex;gap:6px;margin-top:13px;flex-wrap:wrap}
+.tag{font-size:11px;color:var(--muted);background:var(--line-soft);border-radius:5px;padding:2px 7px}
+.note{margin-top:20px;font-size:12px;color:var(--faint);line-height:1.7}
+.note code{font-family:ui-monospace,Consolas,monospace;background:var(--line-soft);border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+    <span>内部工具集</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-tab="home" role="tab">首页</button>
+    <button class="tab" data-tab="timesheet" role="tab">工时填报机</button>
+    <button class="tab" data-tab="diff" role="tab">文本对比工具</button>
+  </nav>
+  <span class="sp"></span>
+  <span class="ver">v1.1.0 · 离线可用</span>
+  <a class="ext" id="extLink" href="timesheet.html" target="_blank" rel="noopener">在新窗口打开</a>
+</header>
+
+<main>
+  <section class="view on" id="view-home">
+    <div class="home">
+      <div class="home-inner">
+        <h1>两个常用工具，都在本地跑</h1>
+        <p class="lead">不联网、不上传，粘贴的文本和填的工时都只留在本机浏览器里。</p>
+        <div class="cards">
+          <button class="card" type="button" data-open="timesheet">
+            <div class="ch">
+              <span class="ico" style="background:var(--teal-bg)">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--teal-ink)" stroke-width="1.9"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h3M8 17h6"/></svg>
+              </span>
+              <div>
+                <h2>工时填报机</h2>
+                <div class="sub">月度工时自动分配</div>
+              </div>
+            </div>
+            <p>输入本月总工时，自动换算天数并按自然周铺到日历；剩余工作日标 Training，节假日标 Vacation。</p>
+            <div class="tags"><span class="tag">日历视图</span><span class="tag">支持半天</span><span class="tag">CSV 导出</span></div>
+          </button>
+
+          <button class="card" type="button" data-open="diff">
+            <div class="ch">
+              <span class="ico" style="background:var(--blue-bg)">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--blue-ink)" stroke-width="1.9"><rect x="3" y="4" width="7.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="7.5" height="16" rx="1.5"/><path d="M5.5 9h2.5M5.5 13h2.5M16 9h2.5"/></svg>
+              </span>
+              <div>
+                <h2>文本对比工具</h2>
+                <div class="sub">原地高亮行级差异</div>
+              </div>
+            </div>
+            <p>左右两栏粘贴文本，差异直接显示在输入框里；并排详细视图严格对齐行号，支持 UTF-8 / GBK 文件。</p>
+            <div class="tags"><span class="tag">行级 + 字符级</span><span class="tag">差异跳转</span><span class="tag">零依赖</span></div>
+          </button>
+        </div>
+        <div class="note">
+          两个工具各自独立，互不影响。快捷键 <code>Alt + 1/2/3</code> 切换标签。<br>
+          文件结构：<code>index.html</code>（工具集）、<code>timesheet.html</code>、<code>diff-viewer.html</code>，三者放在同一目录即可。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-timesheet"><iframe id="frTimesheet" title="工时填报机" src="about:blank" data-src="timesheet.html"></iframe></section>
+  <section class="view" id="view-diff"><iframe id="frDiff" title="文本对比工具" src="about:blank" data-src="diff-viewer.html"></iframe></section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var views = {
+    home: document.getElementById('view-home'),
+    timesheet: document.getElementById('view-timesheet'),
+    diff: document.getElementById('view-diff')
+  };
+  var frames = { timesheet: document.getElementById('frTimesheet'), diff: document.getElementById('frDiff') };
+  var extLink = document.getElementById('extLink');
+  var pages = { home: 'index.html', timesheet: 'timesheet.html', diff: 'diff-viewer.html' };
+  var current = 'home';
+
+  function loadFrame(name) {
+    var f = frames[name];
+    if (!f) return;
+    if (!f.getAttribute('data-loaded')) {
+      f.src = f.getAttribute('data-src');
+      f.setAttribute('data-loaded', '1');
+    }
+  }
+
+  function go(name, push) {
+    if (!views[name]) name = 'home';
+    current = name;
+    tabs.forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === name); });
+    Object.keys(views).forEach(function (k) { views[k].classList.toggle('on', k === name); });
+    if (name !== 'home') loadFrame(name);
+    extLink.href = pages[name] || 'index.html';
+    extLink.textContent = name === 'home' ? '在新窗口打开' : '在新窗口打开';
+    if (push !== false) {
+      try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) { }
+    }
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { go(t.getAttribute('data-tab')); });
+  });
+
+  Array.prototype.slice.call(document.querySelectorAll('[data-open]')).forEach(function (b) {
+    b.addEventListener('click', function () { go(b.getAttribute('data-open')); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === '1') { go('home'); e.preventDefault(); }
+    else if (e.key === '2') { go('timesheet'); e.preventDefault(); }
+    else if (e.key === '3') { go('diff'); e.preventDefault(); }
+  });
+
+  var hash = (location.hash || '').replace('#', '');
+  go(hash && views[hash] ? hash : 'home', false);
+
+  window.__hub = { go: go, current: function () { return current; } };
+})();
+</script>
+</body>
+</html>
